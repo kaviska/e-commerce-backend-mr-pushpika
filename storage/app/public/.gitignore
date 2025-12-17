@@ -1,0 +1,4 @@
+*
+!imports/images/assets
+!imports/images/assets/**
+!.gitignore

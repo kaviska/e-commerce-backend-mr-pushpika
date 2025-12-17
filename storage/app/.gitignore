@@ -1,0 +1,8 @@
+*
+!private/
+!public/
+!imports/
+!imports/**
+!imports/images/assets
+!imports/images/assets/**
+!.gitignore

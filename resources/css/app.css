@@ -1,0 +1,98 @@
+@import 'tailwindcss';
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+body{
+    font-family: "Poppins", sans-serif;
+}
+
+
+
+/* Custom Hero Section Styles */
+.hero-gradient {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+}
+
+.hero-text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* E-commerce optimized green palette */
+.primary {
+    color: #16a34a; /* Modern green - good for CTAs and trust */
+}
+.bg-primary {
+    background-color: #16a34a;
+}
+.primary-hover {
+    color: #15803d; /* Darker green for hover states */
+}
+.bg-primary-hover {
+    background-color: #15803d;
+}
+.primary-light {
+    color: #22c55e; /* Lighter green for accents */
+}
+.bg-primary-light {
+    background-color: #22c55e;
+}
+.secondary {
+    color: #FFDF20;
+}
+.bg-secondary {
+    background-color: #FFDF20;
+}
+
+/* Custom button hover effects for hero */
+.hero-btn-primary {
+    background-color: #16a34a;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    transition: all 0.3s;
+    transform: scale(1);
+}
+
+.hero-btn-primary:hover {
+    background-color: #15803d;
+    transform: scale(1.05);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.hero-btn-secondary {
+    border: 2px solid white;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    transition: all 0.3s;
+}
+
+.hero-btn-secondary:hover {
+    background-color: white;
+    color: #374151;
+}
+
+/* Smooth slide transitions */
+.slide-enter {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.slide-enter-active {
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity 1000ms ease-in-out, transform 1000ms ease-in-out;
+}
+
+.slide-exit {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.slide-exit-active {
+    opacity: 0;
+    transform: translateX(-100%);
+    transition: opacity 1000ms ease-in-out, transform 1000ms ease-in-out;
+}

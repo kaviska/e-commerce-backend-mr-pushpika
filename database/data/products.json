@@ -1,0 +1,169 @@
+[
+    {
+        "product_id": 1,
+        "name": "Astra",
+        "slug": "astra",
+        "description": "Astra butter is a premium quality butter made from the finest cream, with a rich and creamy texture and a subtle sweetness. It is perfect for cooking, baking, and spreading on toast.",
+        "primary_image": "storage/images/products/astra.jpg",
+        "brand_id": 1,
+        "category_id": 1,
+         "barcode": "123456898123",
+        "web_availability": true
+       
+        
+    },
+    {
+        "product_id": 2,
+        "name": "Kotmale Salted Butter",
+        "slug": "kotmale-salted-butter",
+        "description": "A bit of Kotmale Salted Butter adds a touch of elegance to any dish. Its rich, creamy texture and subtle sweetness make it a delight for cooking, baking, and spreading on toast.",
+        "primary_image": "storage/images/products/kotmale-salted-butter.jpeg",
+        "brand_id": 2,
+        "category_id": 1,
+         "barcode": "1234589890123",
+        "web_availability": true
+    },
+    {
+        "product_id": 3,
+        "name": "Fondre Original Fat Spread",
+        "slug": "fondre-original-fat-spread",
+        "description": "Fondre Original Fat Spread offers a luxurious butter experience, crafted from the finest cream to deliver a rich, creamy texture and a hint of sweetness. Ideal for a variety of uses, including cooking, baking, and as a delicious toast topping.",
+        "primary_image": "storage/images/products/fondre-original-fat-spread.jpeg",
+        "brand_id": 2,
+        "category_id": 2,
+         "barcode": "1234590890123",
+        "web_availability": true
+    },
+    {
+        "product_id": 4,
+        "name": "Happy Hen Eggs Village Eggs",
+        "slug": "happy-hen-eggs-village-eggs",
+        "description": "Experience the taste of freedom with Happy Hen Eggs Village Eggs. These free-range eggs offer a rich, creamy texture and a delicious flavor, making them perfect for breakfast, baking, or any culinary creation.",
+        "primary_image": "storage/images/products/happy-hen-eggs-village-eggs.png",
+        "brand_id": 3,
+        "category_id": 2,
+         "barcode": "12345890123",
+        "web_availability": true
+    },
+    {
+        "product_id": 5,
+        "name": "Farm Fresh Eggs",
+        "slug": "farm-fresh-eggs",
+        "description": "Experience the freshness of farm-raised eggs with Farm Fresh Eggs. These eggs offer a rich, creamy texture and a delicious flavor, making them perfect for breakfast, baking, or any culinary creation.",
+        "primary_image": "storage/images/products/FarmFreshEgg.png",
+        "brand_id": 1,
+        "category_id": 2,
+         "barcode": "12345890123",
+        "web_availability": true
+    },
+    {
+        "product_id": 6,
+        "name": "Golden Yolk Eggs",
+        "slug": "golden-yolk-eggs",
+        "description": "Golden Yolk Eggs bring a touch of sunshine to your plate. These eggs boast a vibrant, golden yolk and a rich, creamy texture, ideal for cooking, baking, or simply enjoying on their own.",
+        "primary_image": "storage/images/products/GoldenYolkEggs.png",
+        "brand_id": 2,
+        "category_id": 3,
+         "barcode": "12345670123",
+        "web_availability": true
+    },
+    {
+        "product_id": 7,
+        "name": "Free Range Eggs",
+        "slug": "free-range-eggs",
+        "description": "Free Range Eggs offer a taste of freedom with every bite. These eggs come from hens that roam freely, resulting in a richer, more complex flavor and a satisfying texture.",
+        "primary_image": "storage/images/products/FreeRangeEggs.jpg",
+        "brand_id": 3,
+        "category_id": 5,
+         "barcode": "12345670123",
+        "web_availability": true
+    },
+    {
+        "product_id": 8,
+        "name": "Organic Eggs",
+        "slug": "organic-eggs",
+        "description": "Organic Eggs are the epitome of natural goodness. These eggs are produced without antibiotics, hormones, or pesticides, ensuring a healthier, more sustainable choice for your family.",
+        "primary_image": "storage/images/products/placeholder.jpg",
+        "brand_id": 1,
+        "category_id": 2,
+         "barcode": "12345670123",
+        "web_availability": true
+    },
+    {
+        "product_id": 9,
+        "name": "Happy cow cheese",
+        "slug": "happy-cow-cheese",
+        "description": "happy cow cheese represent a commitment to animal welfare. These eggs come from hens that are free to roam and engage in natural behaviors, resulting in a more humane and sustainable product.",
+        "primary_image": "storage/images/products/29519-happy-cow_regular-.jpg",
+        "brand_id": 2,
+        "category_id": 3,
+         "barcode": "12345678123",
+        "web_availability": true
+    },
+    {
+        "product_id": 10,
+        "name": "Ride Energy Drink",
+        "slug": "vitamin-enriched-eggs",
+        "description": "Ride Energy Drink offer an added nutritional boost. These eggs are fortified with essential vitamins and minerals, making them an excellent choice for health-conscious consumers.",
+        "primary_image": "storage/images/products/Ride Energy Drink.png",
+        "brand_id": 3,
+        "category_id": 5,
+         "barcode": "123456789023",
+        "web_availability": true
+    },
+    {
+        "product_id": 11,
+        "name": "Heritage Breed Eggs",
+        "slug": "heritage-breed-eggs",
+        "description": "Heritage Breed Eggs offer a unique taste experience. These eggs come from rare and endangered breeds, ensuring a rich, complex flavor and a satisfying texture.",
+        "primary_image": "storage/images/products/placeholder.jpg",
+        "brand_id": 1,
+        "category_id": 2,
+         "barcode": "1234567868123",
+        "web_availability": true
+    },
+    {
+        "product_id": 12,
+        "name": "San Remo Pasta Macaroni",
+        "slug": "San-Remo-Pasta-Macaronis",
+        "description": "San Remo Pasta Macaroni embody the essence of nature. These eggs come from hens that roam freely on pasture, resulting in a more nutritious and flavorful product.",
+        "primary_image": "storage/images/products/SanRemoPastaMacaroni.jpeg",
+        "brand_id": 2,
+        "category_id": 3,
+         "barcode": "1234567990123",
+        "web_availability": true
+    },
+    {
+        "product_id": 13,
+        "name": "Coca Cola",
+        "slug": "Coca-Cola",
+        "description": "Coca Cola provide a boost of healthy fats. These eggs are enriched with omega-3 fatty acids, making them an excellent choice for health-conscious consumers.",
+        "primary_image": "storage/images/products/cocacola.png",
+        "brand_id": 3,
+        "category_id": 5,
+         "barcode": "1234568990123",
+        "web_availability": true
+    },
+    {
+        "product_id": 14,
+        "name": "Quail Eggs",
+        "slug": "quail-eggs",
+        "description": "Quail Eggs offer a delicate, exotic taste. These small eggs are perfect for adding a touch of elegance to any dish or for snacking on their own.",
+        "primary_image": "storage/images/products/placeholder.jpg",
+        "brand_id": 1,
+        "category_id": 2,
+         "barcode": "123456778123",
+        "web_availability": true
+    },
+    {
+        "product_id": 15,
+        "name": "Wijaya Chilli Powder",
+        "slug": "Wijaya-Chilli-Powder",
+        "description": "Wijaya Chilli Powder bring a rich, creamy texture to any dish. These eggs are larger than chicken eggs and offer a more intense flavor, making them ideal for baking and cooking.",
+        "primary_image": "storage/images/products/wijayachilipowder.jpeg",
+        "brand_id": 2,
+        "category_id": 3,
+         "barcode": "1234567878123",
+        "web_availability": true
+    }
+]

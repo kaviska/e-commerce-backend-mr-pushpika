@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "title": "Royal Dreamz",
+        "description": "dreams in japan with flashback. japan tour.",
+        "image": "storage/images/notices/royal-dreamz.jpg",
+        "link": "https://www.instagram.com/royaldream_de/?hl=en",
+        "status": "active",
+        "start_date": "2025-01-28 19:45:31",
+        "end_date": "2025-06-28 19:45:31",
+        "created_at": "2025-03-28 20:33:47",
+        "updated_at": "2025-03-28 20:33:47"
+    },
+    {
+        "id": 2,
+        "title": "Close Notice - 2025 New Year",
+        "description": "We are closed due to the new year holiday. We will be back on 2025-01-02",
+        "image": "storage/images/notices/close-notice-2025-new-year.jpg",
+        "link": "",
+        "status": "active",
+        "start_date": "2025-02-28 19:45:31",
+        "end_date": "2025-05-28 19:45:31",
+        "created_at": "2025-04-28 20:33:47",
+        "updated_at": "2025-02-28 20:33:47"
+    }
+]

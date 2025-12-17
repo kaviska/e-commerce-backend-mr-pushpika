@@ -1,0 +1,14 @@
+[
+    { "name": "Hokkaido" },
+    { "name": "Tohoku" },
+    { "name": "Kanto" },
+    { "name": "Tokyo" },
+    { "name": "Shin-etsu" },
+    { "name": "Hokuriku" },
+    { "name": "Tokai" },
+    { "name": "Kinki" },
+    { "name": "Chugoku" },
+    { "name": "Shikoku" },
+    { "name": "Kyushu" },
+    { "name": "Okinawa" }
+]
