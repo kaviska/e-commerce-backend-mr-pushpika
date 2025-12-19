@@ -33,6 +33,7 @@ const AddCategory = () => {
     // State
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isCreating, setIsCreating] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     
     // Modal State
@@ -73,6 +74,7 @@ const AddCategory = () => {
 
     // Handlers
     const handleCreateCategory = async () => {
+        setIsCreating(true);
         try {
             const formData = new FormData();
             formData.append('name', newCategory.name);
@@ -119,6 +121,8 @@ const AddCategory = () => {
                 errorMessage = error.message;
             }
             toast.error(errorMessage);
+        } finally {
+            setIsCreating(false);
         }
     };
 
@@ -226,8 +230,11 @@ const AddCategory = () => {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsCategoryModalOpen(false)}>Cancel</Button>
-                        <Button onClick={handleCreateCategory} className="bg-green-600 hover:bg-green-700 text-white">Create</Button>
+                        <Button variant="outline" onClick={() => setIsCategoryModalOpen(false)} disabled={isCreating}>Cancel</Button>
+                        <Button onClick={handleCreateCategory} className="bg-green-600 hover:bg-green-700 text-white" disabled={isCreating}>
+                            {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Create
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

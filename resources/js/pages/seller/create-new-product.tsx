@@ -45,6 +45,8 @@ interface Brand {
 const CreateNewProduct = () => {
     // State
     const [loading, setLoading] = useState(false);
+    const [isCreatingBrand, setIsCreatingBrand] = useState(false);
+    const [isCreatingCategory, setIsCreatingCategory] = useState(false);
     const [categories, setCategories] = useState<Category[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
     
@@ -61,6 +63,14 @@ const CreateNewProduct = () => {
     // Brand Modal State
     const [isBrandModalOpen, setIsBrandModalOpen] = useState(false);
     const [newBrand, setNewBrand] = useState({
+        name: '',
+        slug: '',
+        image: null as File | null
+    });
+    
+    // Category Modal State
+    const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+    const [newCategory, setNewCategory] = useState({
         name: '',
         slug: '',
         image: null as File | null
@@ -134,6 +144,7 @@ const CreateNewProduct = () => {
     };
 
     const handleCreateBrand = async () => {
+        setIsCreatingBrand(true);
         try {
             const data = new FormData();
             data.append('name', newBrand.name);
@@ -154,6 +165,35 @@ const CreateNewProduct = () => {
             }
         } catch (error: any) {
             toast.error('Failed to create brand');
+        } finally {
+            setIsCreatingBrand(false);
+        }
+    };
+
+    const handleCreateCategory = async () => {
+        setIsCreatingCategory(true);
+        try {
+            const data = new FormData();
+            data.append('name', newCategory.name);
+            data.append('slug', newCategory.slug);
+            if (newCategory.image) {
+                data.append('image', newCategory.image);
+            }
+
+            const response = await axios.post('/api/categories', data, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            if (response.data.status === 'success') {
+                toast.success('Category created successfully');
+                fetchCategories();
+                setIsCategoryModalOpen(false);
+                setNewCategory({ name: '', slug: '', image: null });
+            }
+        } catch (error: any) {
+            toast.error('Failed to create category');
+        } finally {
+            setIsCreatingCategory(false);
         }
     };
 
@@ -203,7 +243,18 @@ const CreateNewProduct = () => {
                     {/* Category & Brand */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <Label className="text-base font-medium text-gray-900">Category</Label>
+                            <div className="flex items-center justify-between">
+                                <Label className="text-base font-medium text-gray-900">Category</Label>
+                                <Button 
+                                    type="button" 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="h-auto p-0 text-green-600 hover:text-green-700 font-medium"
+                                    onClick={() => setIsCategoryModalOpen(true)}
+                                >
+                                    + New Category
+                                </Button>
+                            </div>
                             <Select 
                                 value={formData.category_id} 
                                 onValueChange={(val) => setFormData({...formData, category_id: val})}
@@ -354,8 +405,55 @@ const CreateNewProduct = () => {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsBrandModalOpen(false)} className="rounded-xl">Cancel</Button>
-                        <Button onClick={handleCreateBrand} className={`${buttonStyle} rounded-xl`}>Create</Button>
+                        <Button variant="outline" onClick={() => setIsBrandModalOpen(false)} className="rounded-xl" disabled={isCreatingBrand}>Cancel</Button>
+                        <Button onClick={handleCreateBrand} className={`${buttonStyle} rounded-xl`} disabled={isCreatingBrand}>
+                            {isCreatingBrand && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Create
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Create Category Modal */}
+            <Dialog open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen}>
+                <DialogContent className="bg-white rounded-2xl">
+                    <DialogHeader>
+                        <DialogTitle>Create Category</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4 bg-white">
+                        <div className="space-y-2">
+                            <Label>Category Name</Label>
+                            <Input 
+                                placeholder="Category Name"
+                                className={inputStyle}
+                                value={newCategory.name}
+                                onChange={(e) => setNewCategory({...newCategory, name: e.target.value, slug: e.target.value.toLowerCase().replace(/\s+/g, '-')})}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Slug</Label>
+                            <Input 
+                                placeholder="category-slug"
+                                className={inputStyle}
+                                value={newCategory.slug}
+                                onChange={(e) => setNewCategory({...newCategory, slug: e.target.value})}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Image</Label>
+                            <Input 
+                                type="file"
+                                className="h-12 pt-2"
+                                onChange={(e) => e.target.files && setNewCategory({...newCategory, image: e.target.files[0]})}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsCategoryModalOpen(false)} className="rounded-xl" disabled={isCreatingCategory}>Cancel</Button>
+                        <Button onClick={handleCreateCategory} className={`${buttonStyle} rounded-xl`} disabled={isCreatingCategory}>
+                            {isCreatingCategory && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Create
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

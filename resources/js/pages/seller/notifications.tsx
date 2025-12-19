@@ -70,6 +70,8 @@ const SellerNotifications = () => {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     
     // Form states
     const [formData, setFormData] = useState({
@@ -127,7 +129,7 @@ const SellerNotifications = () => {
             return;
         }
 
-        setLoading(true);
+        setIsSubmitting(true);
 
         const data = new FormData();
         data.append('title', formData.title);
@@ -176,13 +178,14 @@ const SellerNotifications = () => {
             console.error('Submit error:', error);
             toast.error(error.response?.data?.message || 'Something went wrong');
         } finally {
-            setLoading(false);
+            setIsSubmitting(false);
         }
     };
 
     const handleDelete = async (id: number) => {
         if (!confirm('Are you sure you want to delete this notification? This action cannot be undone.')) return;
         
+        setDeletingId(id);
         try {
             const response = await axios.delete('/api/notices', {
                 data: { id }
@@ -197,6 +200,8 @@ const SellerNotifications = () => {
         } catch (error: any) {
             console.error('Delete error', error);
             toast.error(error.response?.data?.message || 'Failed to delete notification');
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -353,15 +358,15 @@ const SellerNotifications = () => {
                                             <td className="px-6 py-4 text-right">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500">
-                                                            <MoreVertical className="h-4 w-4" />
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500" disabled={deletingId === notice.id}>
+                                                            {deletingId === notice.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreVertical className="h-4 w-4" />}
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem onClick={() => editNotice(notice)}>
+                                                        <DropdownMenuItem onClick={() => editNotice(notice)} disabled={deletingId !== null}>
                                                             <Pencil className="w-4 h-4 mr-2" /> Edit
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(notice.id)}>
+                                                        <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(notice.id)} disabled={deletingId !== null}>
                                                             <Trash2 className="w-4 h-4 mr-2" /> Delete
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
@@ -574,16 +579,17 @@ const SellerNotifications = () => {
                             variant="outline" 
                             onClick={() => { setIsCreateOpen(false); resetForm(); }}
                             type="button"
+                            disabled={isSubmitting}
                         >
                             Cancel
                         </Button>
                         <Button 
                             form="notice-form" 
                             type="submit" 
-                            disabled={loading}
+                            disabled={isSubmitting}
                             className="bg-green-600 text-white hover:bg-green-700"
                         >
-                            {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                             {isEdit ? 'Update Notification' : 'Create Notification'}
                         </Button>
                     </DialogFooter>

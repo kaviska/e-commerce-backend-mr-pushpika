@@ -8,7 +8,8 @@ import {
     Upload,
     X,
     AlertCircle,
-    Edit
+    Edit,
+    Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -48,6 +49,7 @@ const HeroSliders = () => {
     const [loading, setLoading] = useState(true);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingSlider, setEditingSlider] = useState<HeroSlider | null>(null);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
     const [formData, setFormData] = useState({
         heading: '',
         sub_heading: '',
@@ -168,6 +170,7 @@ const HeroSliders = () => {
             return;
         }
 
+        setDeletingId(id);
         try {
             const response = await axios.delete(`/api/hero-sliders/${id}`);
             if (response.data.status === 'success') {
@@ -176,6 +179,8 @@ const HeroSliders = () => {
             }
         } catch (err: any) {
             setError(err.response?.data?.message || 'Failed to delete hero slider');
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -389,6 +394,7 @@ const HeroSliders = () => {
                                                         size="sm"
                                                         onClick={() => handleOpenEditDialog(slider)}
                                                         className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                        disabled={deletingId === slider.id || submitting}
                                                     >
                                                         <Edit className="w-4 h-4" />
                                                     </Button>
@@ -396,8 +402,9 @@ const HeroSliders = () => {
                                                         variant="destructive"
                                                         size="sm"
                                                         onClick={() => handleDelete(slider.id)}
+                                                        disabled={deletingId === slider.id || submitting}
                                                     >
-                                                        <Trash2 className="w-4 h-4" />
+                                                        {deletingId === slider.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                                                     </Button>
                                                 </div>
                                             </div>

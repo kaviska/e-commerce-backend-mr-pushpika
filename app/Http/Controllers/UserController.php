@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Helper\Response;
 use App\Models\User;
+use App\Enums\UserType;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -82,6 +85,7 @@ class UserController extends Controller
         }
     }
 
+   
     public function update(Request $request)
     {
         try {
@@ -187,5 +191,61 @@ class UserController extends Controller
             return Response::error('An error occurred while deleting the user.', 500);
         }
 
+    }
+
+    public function createAdminUser(Request $request)
+    {
+        try {
+            // Validate the request
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email|max:255',
+                'mobile' => [
+                    'required',
+                    'string',
+                    'max:15',
+                    'unique:users,mobile',
+                    'regex:/^(\+94|0)?\d{9}$|^(\+81|0)?\d{10}$/', // Sri Lanka and Japan mobile numbers
+                ],
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+
+            // Start database transaction
+            DB::beginTransaction();
+
+            // Create the user
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'mobile' => $validated['mobile'],
+                'password' => Hash::make($validated['password']),
+                'user_type' => UserType::ADMIN,
+                'email_verified_at' => now(), // Auto-verify admin users
+            ]);
+
+            // Assign admin role
+            $adminRole = Role::firstOrCreate(['name' => 'admin']);
+            $user->assignRole($adminRole);
+
+            // Commit the transaction
+            DB::commit();
+
+            return Response::success($user, 'Admin user created successfully', 201);
+        } catch (\Illuminate\Validation\ValidationException $validationException) {
+            Log::error('Validation failed for admin user creation: ', $validationException->errors());
+            return Response::error($validationException->errors(), 'Validation failed', 422);
+        } catch (\Throwable $th) {
+            // Rollback the transaction if an error occurs
+            DB::rollBack();
+            Log::error(
+                'Error occurred while creating admin user: ',
+                [
+                    'error' => $th->getMessage(),
+                    'line' => $th->getLine(),
+                    'file' => $th->getFile(),
+                ]
+            );
+            return Response::error('An error occurred while creating the admin user.', 500);
+        }
     }
 }

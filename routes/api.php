@@ -131,6 +131,9 @@ Route::post('/login', [ApiAuthController::class, 'login']);
 Route::get('/is-logged', [ApiAuthController::class, 'isLogin']);
 Route::post('/forgot-password', [ApiAuthController::class, 'forgotPassword']);
 
+// 👤 Admin User Creation
+Route::post('/users/admin', [UserController::class, 'createAdminUser']);
+
 
 
 // Guest User

@@ -45,6 +45,8 @@ const ManageCategories = () => {
     const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
+    const [isUpdating, setIsUpdating] = useState(false);
     
     // Edit form state
     const [formData, setFormData] = useState({
@@ -93,7 +95,7 @@ const ManageCategories = () => {
         e.preventDefault();
         if (!currentCategory) return;
 
-        setLoading(true);
+        setIsUpdating(true);
         try {
             const data = new FormData();
             data.append('id', currentCategory.id.toString());
@@ -120,7 +122,7 @@ const ManageCategories = () => {
             console.error('Update error:', error);
             toast.error(error.response?.data?.message || 'Failed to update category');
         } finally {
-            setLoading(false);
+            setIsUpdating(false);
         }
     };
 
@@ -129,6 +131,7 @@ const ManageCategories = () => {
             return;
         }
 
+        setDeletingId(categoryId);
         try {
             const response = await axios.delete('/api/categories', {
                 data: { id: categoryId }
@@ -143,6 +146,8 @@ const ManageCategories = () => {
         } catch (error: any) {
             console.error('Delete error:', error);
             toast.error(error.response?.data?.errors || 'Failed to delete category');
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -240,15 +245,15 @@ const ManageCategories = () => {
                                             <td className="px-6 py-4 text-right">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500">
-                                                            <MoreVertical className="h-4 w-4" />
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500" disabled={deletingId === category.id}>
+                                                            {deletingId === category.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreVertical className="h-4 w-4" />}
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" className="bg-white">
-                                                        <DropdownMenuItem onClick={() => handleEdit(category)}>
+                                                        <DropdownMenuItem onClick={() => handleEdit(category)} disabled={deletingId !== null}>
                                                             <Pencil className="w-4 h-4 mr-2" /> Edit
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(category.id)}>
+                                                        <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(category.id)} disabled={deletingId !== null}>
                                                             <Trash2 className="w-4 h-4 mr-2" /> Delete
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
@@ -326,11 +331,11 @@ const ManageCategories = () => {
                     </div>
 
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => { setIsEditOpen(false); resetForm(); }}>
+                        <Button variant="outline" onClick={() => { setIsEditOpen(false); resetForm(); }} disabled={isUpdating}>
                             Cancel
                         </Button>
-                        <Button form="edit-category-form" type="submit" disabled={loading} className="bg-green-600 hover:bg-green-700 text-white">
-                            {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                        <Button form="edit-category-form" type="submit" disabled={isUpdating} className="bg-green-600 hover:bg-green-700 text-white">
+                            {isUpdating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                             Update Category
                         </Button>
                     </DialogFooter>

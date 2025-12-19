@@ -40,6 +40,8 @@ const ManageBrands = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [currentBrand, setCurrentBrand] = useState<Brand | null>(null);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
+    const [isUpdating, setIsUpdating] = useState(false);
     
     // Edit form state
     const [formData, setFormData] = useState({
@@ -77,7 +79,7 @@ const ManageBrands = () => {
         e.preventDefault();
         if (!currentBrand) return;
 
-        setLoading(true);
+        setIsUpdating(true);
         try {
             const response = await axios.put('/api/brands', {
                 id: currentBrand.id.toString(),
@@ -96,7 +98,7 @@ const ManageBrands = () => {
             console.error('Update error:', error);
             toast.error(error.response?.data?.message || 'Failed to update brand');
         } finally {
-            setLoading(false);
+            setIsUpdating(false);
         }
     };
 
@@ -105,6 +107,7 @@ const ManageBrands = () => {
             return;
         }
 
+        setDeletingId(brandId);
         try {
             const response = await axios.delete('/api/brands', {
                 data: { id: brandId.toString() }
@@ -119,6 +122,8 @@ const ManageBrands = () => {
         } catch (error: any) {
             console.error('Delete error:', error);
             toast.error(error.response?.data?.message || 'Failed to delete brand');
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -197,15 +202,15 @@ const ManageBrands = () => {
                                             <td className="px-6 py-4 text-right">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500">
-                                                            <MoreVertical className="h-4 w-4" />
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500" disabled={deletingId === brand.id}>
+                                                            {deletingId === brand.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreVertical className="h-4 w-4" />}
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" className="bg-white">
-                                                        <DropdownMenuItem onClick={() => handleEdit(brand)}>
+                                                        <DropdownMenuItem onClick={() => handleEdit(brand)} disabled={deletingId !== null}>
                                                             <Pencil className="w-4 h-4 mr-2" /> Edit
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(brand.id)}>
+                                                        <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(brand.id)} disabled={deletingId !== null}>
                                                             <Trash2 className="w-4 h-4 mr-2" /> Delete
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
@@ -245,11 +250,11 @@ const ManageBrands = () => {
                     </form>
 
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => { setIsEditOpen(false); resetForm(); }}>
+                        <Button variant="outline" onClick={() => { setIsEditOpen(false); resetForm(); }} disabled={isUpdating}>
                             Cancel
                         </Button>
-                        <Button form="edit-brand-form" type="submit" disabled={loading} className="bg-green-600 text-white hover:bg-green-700">
-                            {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                        <Button form="edit-brand-form" type="submit" disabled={isUpdating} className="bg-green-600 text-white hover:bg-green-700">
+                            {isUpdating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                             Update Brand
                         </Button>
                     </DialogFooter>

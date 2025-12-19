@@ -21,6 +21,7 @@ const AddBrand = () => {
     // State
     const [brands, setBrands] = useState<Brand[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isCreating, setIsCreating] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
     // Modal State
@@ -60,6 +61,7 @@ const AddBrand = () => {
 
     // Handlers
     const handleCreateBrand = async () => {
+        setIsCreating(true);
         try {
             const formData = new FormData();
             formData.append('name', newBrand.name);
@@ -106,6 +108,8 @@ const AddBrand = () => {
                 errorMessage = error.message;
             }
             toast.error(errorMessage);
+        } finally {
+            setIsCreating(false);
         }
     };
 
@@ -207,10 +211,11 @@ const AddBrand = () => {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsBrandModalOpen(false)}>
+                        <Button variant="outline" onClick={() => setIsBrandModalOpen(false)} disabled={isCreating}>
                             Cancel
                         </Button>
-                        <Button onClick={handleCreateBrand} className="bg-green-600 text-white hover:bg-green-700">
+                        <Button onClick={handleCreateBrand} className="bg-green-600 text-white hover:bg-green-700" disabled={isCreating}>
+                            {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Create
                         </Button>
                     </DialogFooter>

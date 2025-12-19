@@ -75,6 +75,8 @@ const ManageProducts = () => {
     const [brands, setBrands] = useState<Brand[]>([]);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
+    const [isUpdating, setIsUpdating] = useState(false);
     
     // Edit form state
     const [formData, setFormData] = useState({
@@ -158,7 +160,7 @@ const ManageProducts = () => {
         e.preventDefault();
         if (!currentProduct) return;
 
-        setLoading(true);
+        setIsUpdating(true);
         try {
             const data = new FormData();
             data.append('id', currentProduct.id.toString());
@@ -188,7 +190,7 @@ const ManageProducts = () => {
             console.error('Update error:', error);
             toast.error(error.response?.data?.message || 'Failed to update product');
         } finally {
-            setLoading(false);
+            setIsUpdating(false);
         }
     };
 
@@ -197,6 +199,7 @@ const ManageProducts = () => {
             return;
         }
 
+        setDeletingId(productId);
         try {
             const response = await axios.delete('/api/products', {
                 data: { id: productId }
@@ -211,6 +214,8 @@ const ManageProducts = () => {
         } catch (error: any) {
             console.error('Delete error:', error);
             toast.error(error.response?.data?.errors || 'Failed to delete product');
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -319,15 +324,15 @@ const ManageProducts = () => {
                                             <td className="px-6 py-4 text-right">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500">
-                                                            <MoreVertical className="h-4 w-4" />
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500" disabled={deletingId === product.id}>
+                                                            {deletingId === product.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreVertical className="h-4 w-4" />}
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" className="bg-white">
-                                                        <DropdownMenuItem onClick={() => handleEdit(product)}>
+                                                        <DropdownMenuItem onClick={() => handleEdit(product)} disabled={deletingId !== null}>
                                                             <Pencil className="w-4 h-4 mr-2" /> Edit
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(product.id)}>
+                                                        <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(product.id)} disabled={deletingId !== null}>
                                                             <Trash2 className="w-4 h-4 mr-2" /> Delete
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
@@ -451,11 +456,11 @@ const ManageProducts = () => {
                     </div>
 
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => { setIsEditOpen(false); resetForm(); }}>
+                        <Button variant="outline" onClick={() => { setIsEditOpen(false); resetForm(); }} disabled={isUpdating}>
                             Cancel
                         </Button>
-                        <Button form="edit-product-form" type="submit" disabled={loading} className="bg-green-600 hover:bg-green-700 text-white">
-                            {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                        <Button form="edit-product-form" type="submit" disabled={isUpdating} className="bg-green-600 hover:bg-green-700 text-white">
+                            {isUpdating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                             Update Product
                         </Button>
                     </DialogFooter>

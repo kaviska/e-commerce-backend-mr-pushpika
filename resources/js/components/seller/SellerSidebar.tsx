@@ -16,7 +16,9 @@ import {
     Layers,
     Bell,
     Image,
-    Archive
+    Archive,
+    Users,
+    GitBranch
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
@@ -65,7 +67,7 @@ const SellerSidebar = ({ className }: SidebarProps) => {
             name: 'Products', 
             icon: Package,
             children: [
-                { name: 'Add Existing Product', href: '/seller/products/add-existing', icon: Plus },
+                { name: 'Add Stock', href: '/seller/products/add-existing', icon: Plus },
                 { name: 'Create New Product', href: '/seller/products/create', icon: List },
                 { name: 'Manage Products', href: '/seller/products/manage', icon: Settings },
                 { name: 'Manage Stock', href: '/seller/stocks/manage', icon: Archive },
@@ -73,12 +75,14 @@ const SellerSidebar = ({ className }: SidebarProps) => {
                 { name: 'Manage Brands', href: '/seller/brands/manage', icon: Settings },
                 { name: 'Categories', href: '/seller/categories/add', icon: Layers },
                 { name: 'Manage Categories', href: '/seller/categories/manage', icon: Settings },
+                { name: 'Variations', href: '/seller/variations', icon: GitBranch },
             ]
         },
         { name: 'Orders', href: '/seller/orders', icon: ShoppingBag },
         { name: 'Hero Sliders', href: '/seller/hero-sliders', icon: Image },
         { name: 'Analytics', href: '/seller/analytics', icon: BarChart3 },
         { name: 'Notifications', href: '/seller/notifications', icon: Bell },
+        { name: 'Admin Users', href: '/seller/users', icon: Users },
         { name: 'Shop Settings', href: '/seller/settings', icon: Store },
         { name: 'Account', href: '/seller/profile', icon: Settings },
     ];

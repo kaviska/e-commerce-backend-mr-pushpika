@@ -64,6 +64,10 @@ Route::get('/seller/categories/manage', function () {
     return Inertia::render('seller/manage-categories');
 })->name('seller.categories.manage');
 
+Route::get('/seller/variations', function () {
+    return Inertia::render('seller/manage-variations');
+})->name('seller.variations');
+
 Route::get('/seller/hero-sliders', function () {
     return Inertia::render('seller/hero-sliders');
 })->name('seller.hero-sliders');
@@ -71,6 +75,10 @@ Route::get('/seller/hero-sliders', function () {
 Route::get('/seller/notifications', function () {
     return Inertia::render('seller/notifications');
 })->name('seller.notifications');
+
+Route::get('/seller/users', function () {
+    return Inertia::render('seller/manage-users');
+})->name('seller.users');
 
 
 Route::middleware(['auth', 'verified'])->group(function () {

@@ -82,6 +82,8 @@ const AddExistingProduct = () => {
     // State
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isSearching, setIsSearching] = useState(false);
+    const [isCreatingBrand, setIsCreatingBrand] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     
@@ -113,6 +115,7 @@ const AddExistingProduct = () => {
     }, []);
 
     const fetchProducts = async () => {
+        setIsSearching(true);
         setLoading(true);
         try {
             const data = await getProducts(searchQuery);
@@ -124,6 +127,7 @@ const AddExistingProduct = () => {
             toast.error('Failed to load products');
         } finally {
             setLoading(false);
+            setIsSearching(false);
         }
     };
 
@@ -204,6 +208,7 @@ const AddExistingProduct = () => {
     };
 
     const handleCreateBrand = async () => {
+        setIsCreatingBrand(true);
         try {
             const formData = new FormData();
             formData.append('name', newBrand.name);
@@ -222,6 +227,8 @@ const AddExistingProduct = () => {
             }
         } catch (error: any) {
             toast.error('Failed to create brand');
+        } finally {
+            setIsCreatingBrand(false);
         }
     };
 
@@ -254,7 +261,9 @@ const AddExistingProduct = () => {
                             type="submit"
                             size="sm" 
                             className="bg-green-600 hover:bg-green-700 text-white rounded-lg px-4"
+                            disabled={isSearching}
                         >
+                            {isSearching && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Search
                         </Button>
                     </div>
@@ -385,8 +394,11 @@ const AddExistingProduct = () => {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsBrandModalOpen(false)}>Cancel</Button>
-                        <Button onClick={handleCreateBrand}>Create</Button>
+                        <Button variant="outline" onClick={() => setIsBrandModalOpen(false)} disabled={isCreatingBrand}>Cancel</Button>
+                        <Button onClick={handleCreateBrand} disabled={isCreatingBrand}>
+                            {isCreatingBrand && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Create
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
