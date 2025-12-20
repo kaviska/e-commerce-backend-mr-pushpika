@@ -26,7 +26,8 @@ return [
     'https://iy-mart-web.vercel.app',
     'https://www.iymart.jp',
     'https://pos.iymart.jp',
-    'http://localhost:9001'
+    'http://localhost:9001',
+    'https://theme.gigantoo.com',
 ],
 
     'allowed_origins_patterns' => [],
