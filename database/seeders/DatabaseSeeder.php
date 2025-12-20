@@ -56,6 +56,9 @@ class DatabaseSeeder extends Seeder
                 // Notice Feature Seeders
              NoticeSeeder::class,
 
+            // Hero Slider Seeder
+            HeroSliderSeeder::class,
+
             // Storage Data Seeder
             StorageDataSeeder::class,
             ReviewSeeder::class,

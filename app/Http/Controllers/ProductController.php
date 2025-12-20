@@ -330,32 +330,32 @@ class ProductController extends Controller
             $sortBy = $request->sortBy ?? "name_z_a";
 
             if ($sortBy == "web_price_high_low") {
-                $products->whereHas('stocks', function ($query) use ($request) {
-                    $query->orderBy('web_price', "desc");
-                });
+                $products->join('stocks', 'products.id', '=', 'stocks.product_id')
+                    ->select('products.*')
+                    ->groupBy('products.id')
+                    ->orderByRaw('MIN(stocks.web_price) DESC');
             }
 
             if ($sortBy == "web_price_low_high") {
-                $products->whereHas('stocks', function ($query) use ($request) {
-                    $query->orderBy('web_price', "asc");
-                });
+                $products->join('stocks', 'products.id', '=', 'stocks.product_id')
+                    ->select('products.*')
+                    ->groupBy('products.id')
+                    ->orderByRaw('MIN(stocks.web_price) ASC');
             }
 
-           
-
             if ($sortBy == "web_discount_high_low") {
-                $products->whereHas('stocks', function ($query) use ($request) {
-                    $query->orderBy('web_discount', "desc");
-                });
+                $products->join('stocks', 'products.id', '=', 'stocks.product_id')
+                    ->select('products.*')
+                    ->groupBy('products.id')
+                    ->orderByRaw('MAX(stocks.web_discount) DESC');
             }
 
             if ($sortBy == "web_discount_low_high") {
-                $products->whereHas('stocks', function ($query) use ($request) {
-                    $query->orderBy('web_discount', "asc");
-                });
+                $products->join('stocks', 'products.id', '=', 'stocks.product_id')
+                    ->select('products.*')
+                    ->groupBy('products.id')
+                    ->orderByRaw('MAX(stocks.web_discount) ASC');
             }
-           
-         
 
             if ($sortBy == "name_a_z") {
                 $products->orderBy('name', "asc");
