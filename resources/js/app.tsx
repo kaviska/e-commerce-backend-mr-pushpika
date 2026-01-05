@@ -7,7 +7,7 @@ import { initializeTheme } from './hooks/use-appearance';
 import { Toaster } from './components/ui/sonner';
 import {UploadImages} from './components/custom/tools/UploadImages';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName ='atsmore';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,

@@ -31,7 +31,7 @@ const CategoriesPage = () => {
             <Head title="All Categories" />
             <Nav />
 
-            <main className="pt-8 pb-16">
+            <main className="md:pt-8 pt-40  pb-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-8">
