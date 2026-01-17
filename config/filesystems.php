@@ -64,6 +64,15 @@ return [
             'report' => false,
         ],
 
+        'brands' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/images/brands'),
+            'url' => env('APP_URL') . '/storage/images/brands',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
         'products' => [
             'driver' => 'local',
             'root' => storage_path('app/public/images/products'),

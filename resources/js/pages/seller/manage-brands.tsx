@@ -9,7 +9,8 @@ import {
     Pencil,
     Trash2,
     MoreVertical,
-    Tag
+    Tag,
+    Image as ImageIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +33,7 @@ import {
 interface Brand {
     id: number;
     name: string;
+    image?: string;
 }
 
 const ManageBrands = () => {
@@ -42,6 +44,8 @@ const ManageBrands = () => {
     const [currentBrand, setCurrentBrand] = useState<Brand | null>(null);
     const [deletingId, setDeletingId] = useState<number | null>(null);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
     
     // Edit form state
     const [formData, setFormData] = useState({
@@ -67,11 +71,21 @@ const ManageBrands = () => {
         }
     };
 
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setSelectedImage(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
     const handleEdit = (brand: Brand) => {
         setCurrentBrand(brand);
         setFormData({
             name: brand.name
         });
+        setImagePreview(brand.image ? '/' + brand.image : null);
+        setSelectedImage(null);
         setIsEditOpen(true);
     };
 
@@ -81,10 +95,14 @@ const ManageBrands = () => {
 
         setIsUpdating(true);
         try {
-            const response = await axios.put('/api/brands', {
-                id: currentBrand.id.toString(),
-                name: formData.name
-            });
+            const data = new FormData();
+            data.append('id', currentBrand.id.toString());
+            data.append('name', formData.name);
+            if (selectedImage) {
+                data.append('image', selectedImage);
+            }
+
+            const response = await axios.post(`/api/brands/update/${currentBrand.id}`, data);
 
             if (response.data.status === 'success') {
                 toast.success('Brand updated successfully');
@@ -132,6 +150,8 @@ const ManageBrands = () => {
         setFormData({
             name: ''
         });
+        setSelectedImage(null);
+        setImagePreview(null);
     };
 
     const filteredBrands = brands.filter(brand =>
@@ -170,6 +190,7 @@ const ManageBrands = () => {
                             <thead className="bg-gray-50 text-gray-600 font-medium border-b border-gray-200">
                                 <tr>
                                     <th className="px-6 py-3">ID</th>
+                                    <th className="px-6 py-3">Image</th>
                                     <th className="px-6 py-3">Brand Name</th>
                                     <th className="px-6 py-3 text-right">Actions</th>
                                 </tr>
@@ -177,14 +198,14 @@ const ManageBrands = () => {
                             <tbody className="divide-y divide-gray-200">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
+                                        <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
                                             <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
                                             Loading brands...
                                         </td>
                                     </tr>
                                 ) : filteredBrands.length === 0 ? (
                                     <tr>
-                                        <td colSpan={3} className="px-6 py-12 text-center text-gray-500">
+                                        <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
                                             <Tag className="w-10 h-10 mx-auto mb-3 text-gray-300" />
                                             <p className="text-lg font-medium text-gray-900">No brands found</p>
                                             <p>{searchQuery ? 'Try a different search term' : 'Create your first brand to get started'}</p>
@@ -195,6 +216,15 @@ const ManageBrands = () => {
                                         <tr key={brand.id} className="hover:bg-gray-50 transition-colors">
                                             <td className="px-6 py-4">
                                                 <div className="text-sm text-gray-500">#{brand.id}</div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="h-12 w-12 rounded-lg bg-gray-100 overflow-hidden flex items-center justify-center">
+                                                    {brand.image ? (
+                                                        <img src={`/${brand.image}`} alt={brand.name} className="h-full w-full object-cover" />
+                                                    ) : (
+                                                        <Tag className="h-6 w-6 text-gray-400" />
+                                                    )}
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="font-medium text-gray-900">{brand.name}</div>
@@ -246,6 +276,23 @@ const ManageBrands = () => {
                                 placeholder="Brand Name"
                                 className="bg-white"
                             />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="image">Brand Image</Label>
+                            <div className="flex flex-col gap-2">
+                                {imagePreview && (
+                                    <div className="w-full h-40 bg-gray-100 rounded-md overflow-hidden border border-gray-200">
+                                        <img src={imagePreview} alt="Preview" className="w-full h-full object-contain" />
+                                    </div>
+                                )}
+                                <Input 
+                                    id="image"
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/jpg"
+                                    onChange={handleImageChange}
+                                    className="bg-white"
+                                />
+                            </div>
                         </div>
                     </form>
 

@@ -47,7 +47,7 @@ Route::post('/categories/update', [CategoryController::class, 'update']); // upd
 // ⚜️ Brands
 Route::resource('/brands', BrandController::class);
 Route::delete('/brands', [BrandController::class, 'destroy']);
-Route::put('/brands', [BrandController::class, 'update']);
+Route::post('/brands/update/{id}', [BrandController::class, 'update']);
 
 // 🔖 Taxonomies
 Route::resource('/taxonomies', TaxonomyController::class);

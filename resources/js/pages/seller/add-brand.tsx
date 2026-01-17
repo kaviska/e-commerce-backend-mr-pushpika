@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { createBrand, getBrands } from '@/hooks/api/seller';
 import { Head } from '@inertiajs/react';
-import { Loader2, Plus, Search, Tag } from 'lucide-react';
+import { Loader2, Plus, Search, Tag, Image as ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import SellerLayout from '../../layouts/SellerLayout';
@@ -13,8 +13,7 @@ import SellerLayout from '../../layouts/SellerLayout';
 interface Brand {
     id: number;
     name: string;
-    slug: string;
-    logo?: string; // Assuming logo field based on file input
+    image?: string;
 }
 
 const AddBrand = () => {
@@ -33,6 +32,7 @@ const AddBrand = () => {
         slug: '',
         image: null as File | null,
     });
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     // Fetch Data
     useEffect(() => {
@@ -56,8 +56,16 @@ const AddBrand = () => {
 
     // Filter brands based on search
     const filteredBrands = brands.filter(
-        (brand) => brand.name.toLowerCase().includes(searchQuery.toLowerCase()) || brand.slug.toLowerCase().includes(searchQuery.toLowerCase()),
+        (brand) => brand.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setNewBrand({ ...newBrand, image: file });
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
 
     // Handlers
     const handleCreateBrand = async () => {
@@ -77,6 +85,7 @@ const AddBrand = () => {
                 fetchBrands();
                 setIsBrandModalOpen(false);
                 setNewBrand({ name: '', slug: '', image: null });
+                setImagePreview(null);
             } else {
                 // Handle error response from API
                 let errorMessage = 'Failed to create brand';
@@ -156,15 +165,14 @@ const AddBrand = () => {
                                 className="group flex items-center gap-4 rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md"
                             >
                                 <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100">
-                                    {brand.logo ? (
-                                        <img src={`/${brand.logo}`} alt={brand.name} className="h-full w-full object-cover" />
+                                    {brand.image ? (
+                                        <img src={`/${brand.image}`} alt={brand.name} className="h-full w-full object-cover" />
                                     ) : (
                                         <Tag className="h-6 w-6 text-gray-400" />
                                     )}
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <h3 className="truncate font-semibold text-gray-900">{brand.name}</h3>
-                                    <p className="truncate text-sm text-gray-500">{brand.slug}</p>
                                 </div>
                             </div>
                         ))}
@@ -193,25 +201,29 @@ const AddBrand = () => {
                                 placeholder="Brand Name"
                                 value={newBrand.name}
                                 onChange={(e) =>
-                                    setNewBrand({ ...newBrand, name: e.target.value, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })
+                                    setNewBrand({ ...newBrand, name: e.target.value })
                                 }
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Slug</Label>
-                            <Input
-                                placeholder="brand-slug"
-                                value={newBrand.slug}
-                                onChange={(e) => setNewBrand({ ...newBrand, slug: e.target.value })}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Logo</Label>
-                            <Input type="file" onChange={(e) => e.target.files && setNewBrand({ ...newBrand, image: e.target.files[0] })} />
+                            <Label>Brand Image</Label>
+                            <div className="flex flex-col gap-2">
+                                {imagePreview && (
+                                    <div className="w-full h-40 bg-gray-100 rounded-md overflow-hidden border border-gray-200">
+                                        <img src={imagePreview} alt="Preview" className="w-full h-full object-contain" />
+                                    </div>
+                                )}
+                                <Input 
+                                    type="file" 
+                                    accept="image/jpeg,image/png,image/jpg"
+                                    onChange={handleImageChange}
+                                    className="bg-white"
+                                />
+                            </div>
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsBrandModalOpen(false)} disabled={isCreating}>
+                        <Button variant="outline" onClick={() => { setIsBrandModalOpen(false); setImagePreview(null); }} disabled={isCreating}>
                             Cancel
                         </Button>
                         <Button onClick={handleCreateBrand} className="bg-green-600 text-white hover:bg-green-700" disabled={isCreating}>
