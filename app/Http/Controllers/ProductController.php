@@ -260,7 +260,9 @@ class ProductController extends Controller
             });
         }
         if ($request->has('latest_product') && $request->latest_product) {
-            $products->orderBy('created_at', 'desc');
+            if (!$request->has('sortBy')) {
+                $products->orderBy('created_at', 'desc');
+            }
         }
 
         // has pos discount filter
@@ -273,7 +275,10 @@ class ProductController extends Controller
         // Newly Arrived
         if ($request->has('newly_arrived') && $request->newly_arrived) {
             // Load the 10 most recently added products
-            $products->orderBy('created_at', 'desc')->limit(10);
+            if (!$request->has('sortBy')) {
+                $products->orderBy('created_at', 'desc');
+            }
+            $products->limit(10);
         }
 
         // Newly Arrived
@@ -292,14 +297,18 @@ class ProductController extends Controller
 
             if ($trendingProductIds->isNotEmpty()) {
                 $products->whereIn('products.id', $trendingProductIds);
-                $products->orderByRaw("FIELD(products.id, " . implode(',', $trendingProductIds->toArray()) . ")");
+                if (!$request->has('sortBy')) {
+                    $products->orderByRaw("FIELD(products.id, " . implode(',', $trendingProductIds->toArray()) . ")");
+                }
             }
         }
 
         // Featured (High Rated)
         if ($request->has('featured') && $request->featured) {
-            $products->having('reviews_avg_rating', '>=', 4)
-                ->orderBy('reviews_avg_rating', 'desc');
+            $products->having('reviews_avg_rating', '>=', 4);
+            if (!$request->has('sortBy')) {
+                $products->orderBy('reviews_avg_rating', 'desc');
+            }
         }
 
         // Best Seller
@@ -333,39 +342,25 @@ class ProductController extends Controller
                 $products->leftJoin('stocks', 'products.id', '=', 'stocks.product_id')
                     ->select('products.*')
                     ->orderBy('stocks.web_price', "desc");
-            }
-
-            if ($sortBy == "web_price_low_high") {
+            } elseif ($sortBy == "web_price_low_high") {
                 $products->leftJoin('stocks', 'products.id', '=', 'stocks.product_id')
                     ->select('products.*')
                     ->orderBy('stocks.web_price', "asc");
-            }
-
-            if ($sortBy == "web_discount_high_low") {
+            } elseif ($sortBy == "web_discount_high_low") {
                 $products->leftJoin('stocks', 'products.id', '=', 'stocks.product_id')
                     ->select('products.*')
                     ->orderBy('stocks.web_discount', "desc");
-            }
-
-            if ($sortBy == "web_discount_low_high") {
+            } elseif ($sortBy == "web_discount_low_high") {
                 $products->leftJoin('stocks', 'products.id', '=', 'stocks.product_id')
                     ->select('products.*')
                     ->orderBy('stocks.web_discount', "asc");
-            }
-
-            if ($sortBy == "name_a_z") {
+            } elseif ($sortBy == "name_a_z") {
                 $products->orderBy('name', "asc");
-            }
-
-            if ($sortBy == "name_z_a") {
+            } elseif ($sortBy == "name_z_a") {
                 $products->orderBy('name', "desc");
-            }
-
-            if ($sortBy == "added_date_new_old") {
+            } elseif ($sortBy == "added_date_new_old") {
                 $products->orderBy('created_at', "desc");
-            }
-
-            if ($sortBy == "added_date_old_new") {
+            } elseif ($sortBy == "added_date_old_new") {
                 $products->orderBy('created_at', "asc");
             }
         }
