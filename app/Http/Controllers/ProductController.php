@@ -497,19 +497,23 @@ class ProductController extends Controller
 
         if ($request->hasFile('primary_image')) {
 
-            // delete old image
-            $oldImage = $product->primary_image; // ex: storage/images/products/slug.jpg
-            $fileName = basename($oldImage);
-            if (Storage::disk('products')->delete($fileName)) {
-                Log::info("Old image deleted successfully");
-            }
+    // delete old image (if exists)
+    if ($product->primary_image) {
+        $oldPath = str_replace('storage/', '', $product->primary_image);
+        Storage::disk('public')->delete($oldPath);
+    }
 
-            // save new image
-            $imageFile = $request->file('primary_image');
-            $fileName = $product->slug . '.' . $imageFile->extension();
-            $imageFile = Storage::disk('products')->putFileAs('/', $imageFile, $fileName);
-            $product->primary_image = "storage/images/products/$imageFile";
-        }
+    // generate unique filename
+    $imageFile = $request->file('primary_image');
+    $fileName = $product->slug . '-' . time() . '.' . $imageFile->extension();
+
+    // store image
+    $path = $imageFile->storeAs('images/products', $fileName, 'public');
+
+    // save path in DB
+    $product->primary_image = 'storage/' . $path;
+}
+
 
         if ($request->has('web_availability')) {
             $product->web_availability = $request->web_availability;
