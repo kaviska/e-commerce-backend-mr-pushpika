@@ -341,18 +341,22 @@ class ProductController extends Controller
             if ($sortBy == "web_price_high_low") {
                 $products->leftJoin('stocks', 'products.id', '=', 'stocks.product_id')
                     ->select('products.*')
+                    ->distinct()
                     ->orderBy('stocks.web_price', "desc");
             } elseif ($sortBy == "web_price_low_high") {
                 $products->leftJoin('stocks', 'products.id', '=', 'stocks.product_id')
                     ->select('products.*')
+                    ->distinct()
                     ->orderBy('stocks.web_price', "asc");
             } elseif ($sortBy == "web_discount_high_low") {
                 $products->leftJoin('stocks', 'products.id', '=', 'stocks.product_id')
                     ->select('products.*')
+                    ->distinct()
                     ->orderBy('stocks.web_discount', "desc");
             } elseif ($sortBy == "web_discount_low_high") {
                 $products->leftJoin('stocks', 'products.id', '=', 'stocks.product_id')
                     ->select('products.*')
+                    ->distinct()
                     ->orderBy('stocks.web_discount', "asc");
             } elseif ($sortBy == "name_a_z") {
                 $products->orderBy('name', "asc");
