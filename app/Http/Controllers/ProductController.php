@@ -330,33 +330,28 @@ class ProductController extends Controller
             $sortBy = $request->sortBy ?? "name_z_a";
 
             if ($sortBy == "web_price_high_low") {
-                $products->whereHas('stocks', function ($query) use ($request) {
-                    $query->orderBy('web_price', "desc");
-                });
+                $products->leftJoin('stocks', 'products.id', '=', 'stocks.product_id')
+                    ->select('products.*')
+                    ->orderBy('stocks.web_price', "desc");
             }
 
             if ($sortBy == "web_price_low_high") {
-                
-                $products->whereHas('stocks', function ($query) use ($request) {
-                    $query->orderBy('web_price', "asc");
-                });
+                $products->leftJoin('stocks', 'products.id', '=', 'stocks.product_id')
+                    ->select('products.*')
+                    ->orderBy('stocks.web_price', "asc");
             }
 
-           
-
             if ($sortBy == "web_discount_high_low") {
-                $products->whereHas('stocks', function ($query) use ($request) {
-                    $query->orderBy('web_discount', "desc");
-                });
+                $products->leftJoin('stocks', 'products.id', '=', 'stocks.product_id')
+                    ->select('products.*')
+                    ->orderBy('stocks.web_discount', "desc");
             }
 
             if ($sortBy == "web_discount_low_high") {
-                $products->whereHas('stocks', function ($query) use ($request) {
-                    $query->orderBy('web_discount', "asc");
-                });
+                $products->leftJoin('stocks', 'products.id', '=', 'stocks.product_id')
+                    ->select('products.*')
+                    ->orderBy('stocks.web_discount', "asc");
             }
-           
-         
 
             if ($sortBy == "name_a_z") {
                 $products->orderBy('name', "asc");
