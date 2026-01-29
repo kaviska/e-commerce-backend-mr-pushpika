@@ -177,7 +177,7 @@ const AddExistingProduct = () => {
 
     const getPriceRange = (product: Product): string => {
         if (!product.stocks || product.stocks.length === 0) {
-            return '¥0.00';
+            return 'LKR 0.00';
         }
 
         const finalPrices = product.stocks.map(stock => {
@@ -190,10 +190,10 @@ const AddExistingProduct = () => {
         const maxPrice = Math.max(...finalPrices);
 
         if (minPrice === maxPrice) {
-            return `¥${minPrice.toFixed(2)}`;
+            return `LKR ${minPrice.toFixed(2)}`;
         }
 
-        return `¥${minPrice.toFixed(2)} - ¥${maxPrice.toFixed(2)}`;
+        return `LKR ${minPrice.toFixed(2)} - LKR ${maxPrice.toFixed(2)}`;
     };
 
     // Handlers

@@ -164,15 +164,15 @@ const Wishlist = () => {
                                                 {item.discount && item.discount > 0 ? (
                                                     <>
                                                         <span className="text-2xl font-bold text-green-600">
-                                                            ¥{(item.price * (1 - item.discount / 100)).toFixed(2)}
+                                                            LKR {(item.price * (1 - item.discount / 100)).toFixed(2)}
                                                         </span>
                                                         <span className="text-sm text-gray-500 line-through">
-                                                            ¥{item.price.toFixed(2)}
+                                                            LKR {item.price.toFixed(2)}
                                                         </span>
                                                     </>
                                                 ) : (
                                                     <span className="text-2xl font-bold text-green-600">
-                                                        ¥{item.price.toFixed(2)}
+                                                        LKR {item.price.toFixed(2)}
                                                     </span>
                                                 )}
                                             </div>

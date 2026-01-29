@@ -449,10 +449,10 @@ const StockModal: React.FC<StockModalProps> = ({
                                         <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Category</p>
                                         <p className="text-base font-semibold text-gray-900">{product?.category?.name || 'Uncategorized'}</p>
                                     </div>
-                                    <div className="bg-white rounded-lg p-4 border border-blue-100 shadow-sm">
+                                    {/* <div className="bg-white rounded-lg p-4 border border-blue-100 shadow-sm">
                                         <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Base Price</p>
                                         <p className="text-base font-semibold text-green-600">${product?.web_price || '0.00'}</p>
-                                    </div>
+                                    </div> */}
                                     {product?.description && (
                                         <div className="bg-white rounded-lg p-4 border border-blue-100 shadow-sm md:col-span-2">
                                             <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Description</p>
@@ -810,7 +810,7 @@ const StockModal: React.FC<StockModalProps> = ({
                                             Price <span className="text-red-500">*</span>
                                         </Label>
                                         <div className="relative">
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">$</span>
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">LKR</span>
                                             <Input 
                                                 type="number" 
                                                 min="0"

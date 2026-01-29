@@ -131,7 +131,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ orderId }) => {
                         </div>
                         <div className="text-right">
                             <div className="text-green-100 text-sm mb-1">Total Amount</div>
-                            <div className="text-4xl font-bold">¥{order.total.toFixed(2)}</div>
+                            <div className="text-4xl font-bold">LKR {order.total.toFixed(2)}</div>
                         </div>
                     </div>
                 </div>
@@ -184,7 +184,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ orderId }) => {
                                                 <div className="flex items-center gap-6 text-sm">
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-gray-600">Unit Price:</span>
-                                                        <span className="font-bold text-gray-900">¥{item.unit_price.toFixed(2)}</span>
+                                                        <span className="font-bold text-gray-900">LKR {item.unit_price.toFixed(2)}</span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-gray-600">Quantity:</span>
@@ -201,7 +201,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ orderId }) => {
                                             <div className="text-right">
                                                 <div className="text-sm text-gray-600 mb-1">Subtotal</div>
                                                 <div className="text-2xl font-bold text-green-600">
-                                                    ¥{item.line_total.toFixed(2)}
+                                                    LKR {item.line_total.toFixed(2)}
                                                 </div>
                                             </div>
                                         </div>
@@ -219,26 +219,26 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ orderId }) => {
                             <div className="space-y-3">
                                 <div className="flex justify-between text-gray-700">
                                     <span>Subtotal</span>
-                                    <span className="font-semibold">¥{order.subtotal.toFixed(2)}</span>
+                                    <span className="font-semibold">LKR {order.subtotal.toFixed(2)}</span>
                                 </div>
                                 {order.total_discount > 0 && (
                                     <div className="flex justify-between text-green-600">
                                         <span>Discount</span>
-                                        <span className="font-semibold">-¥{order.total_discount.toFixed(2)}</span>
+                                        <span className="font-semibold">-LKR {order.total_discount.toFixed(2)}</span>
                                     </div>
                                 )}
                                 <div className="flex justify-between text-gray-700">
                                     <span>Tax</span>
-                                    <span className="font-semibold">¥{order.tax.toFixed(2)}</span>
+                                    <span className="font-semibold">LKR {order.tax.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-700">
                                     <span>Shipping</span>
-                                    <span className="font-semibold">¥{order.shipping_cost.toFixed(2)}</span>
+                                    <span className="font-semibold">LKR {order.shipping_cost.toFixed(2)}</span>
                                 </div>
                                 <div className="border-t border-gray-200 pt-3">
                                     <div className="flex justify-between text-lg">
                                         <span className="font-bold text-gray-900">Total</span>
-                                        <span className="font-bold text-green-600">¥{order.total.toFixed(2)}</span>
+                                        <span className="font-bold text-green-600">LKR {order.total.toFixed(2)}</span>
                                     </div>
                                 </div>
                             </div>

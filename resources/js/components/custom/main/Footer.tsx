@@ -182,7 +182,7 @@ const Footer = () => {
               </div>
               <div>
                 <h5 className="font-semibold">Free Shipping</h5>
-                <p className="text-green-50 text-sm">On orders over ¥5,000</p>
+                <p className="text-green-50 text-sm">On orders over LKR 5,000</p>
               </div>
             </div>
             

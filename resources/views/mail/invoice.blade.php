@@ -145,8 +145,8 @@
                 <tr>
                     <td>{{ $orderItem->product_name }}</td>
                     <td>{{ $orderItem->unit_quantity }}</td>
-                    <td>¥{{ $orderItem->unit_price }}</td>
-                    <td>¥{{ $orderItem->line_total }}</td>
+                    <td>LKR {{ $orderItem->unit_price }}</td>
+                    <td>LKR {{ $orderItem->line_total }}</td>
                 </tr>
             @endforeach
 
@@ -155,34 +155,34 @@
             <table>
                 <tr>
                     <td>Subtotal:</td>
-                    <td>¥{{ $order->subtotal }}</td>
+                    <td>LKR {{ $order->subtotal }}</td>
                 </tr>
                 <tr>
                     <td>Tax (8%):</td>
-                    <td>¥{{ $order->tax }}</td>
+                    <td>LKR {{ $order->tax }}</td>
                 </tr>
                 <tr>
                     <td>Shipping Fee:</td>
-                    <td>¥{{ $order->shipping_cost }}</td>
+                    <td>LKR {{ $order->shipping_cost }}</td>
                 </tr>
                 {{-- <tr>
                     <td>Other Fee:</td>
-                    <td>¥{{ $order->cash_on_delivery_fee }}</td>
+                    <td>LKR {{ $order->cash_on_delivery_fee }}</td>
                 </tr> --}}
                 <tr>
                     <td>Discount:</td>
-                    <td>-¥{{ $order->total_discount }}</td>
+                    <td>-LKR {{ $order->total_discount }}</td>
                 </tr>
                 <tr class="total">
                     <td><strong>Grand Total:</strong></td>
-                    <td><strong>¥{{ $order->total }}</strong></td>
+                    <td><strong>LKR {{ $order->total }}</strong></td>
                 </tr>
             </table>
         </div>
         <div class="footer">
             Thank you for shopping with IY Mart!<br>
             Contact us: info.iymart@gmail.com - +817042239811
-            <p style="color: red; font-style: italic">Note: If you select the Cash on Delivery option, an additional ¥300 will be added to your delivery fee.</p>
+            <p style="color: red; font-style: italic">Note: If you select the Cash on Delivery option, an additional LKR 300 will be added to your delivery fee.</p>
         </div>
     </div>
 </body>

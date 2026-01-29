@@ -172,7 +172,7 @@ const Orders = () => {
                                         <div className="text-right">
                                             <div className="text-sm text-gray-600 mb-1">Total Amount</div>
                                             <div className="text-2xl font-bold text-green-600">
-                                                ¥{order.total.toFixed(2)}
+                                                LKR {order.total.toFixed(2)}
                                             </div>
                                         </div>
                                     </div>
@@ -190,12 +190,12 @@ const Orders = () => {
                                                     <div className="flex items-center gap-4 text-sm text-gray-600">
                                                         <span>Qty: {item.unit_quantity}</span>
                                                         <span>•</span>
-                                                        <span>¥{item.unit_price.toFixed(2)} each</span>
+                                                        <span>LKR {item.unit_price.toFixed(2)} each</span>
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
                                                     <div className="font-bold text-gray-900">
-                                                        ¥{item.line_total.toFixed(2)}
+                                                        LKR {item.line_total.toFixed(2)}
                                                     </div>
                                                 </div>
                                             </div>

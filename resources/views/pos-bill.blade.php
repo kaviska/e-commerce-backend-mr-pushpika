@@ -161,27 +161,27 @@
     @endforeach
             <tr  class="data-section">
                 <td colspan="4" class="line">Subtotal</td>
-                <td>¥{{ number_format($order->subtotal + $order->total_discount, 2) }}</td>
+                <td>LKR {{ number_format($order->subtotal + $order->total_discount, 2) }}</td>
             </tr>
             <tr>
                 <td colspan="4">Total Discount</td>
-                <td>¥{{ number_format($order->total_discount, 2) }}</td>
+                <td>LKR {{ number_format($order->total_discount, 2) }}</td>
             </tr>
             <tr>
                 <td colspan="4">Tax</td>
-                <td>¥{{ number_format($order->tax, 2) }}</td>
+                <td>LKR {{ number_format($order->tax, 2) }}</td>
             </tr>
             <tr>
                 <td colspan="4" class="total">Total</td>
-                <td class="total">¥{{ number_format($order->total, 2) }}</td>
+                <td class="total">LKR {{ number_format($order->total, 2) }}</td>
             </tr>
             <tr>
                 <td colspan="4">Paid Amount</td>
-                <td>¥{{ number_format($payingAmount, 2) }}</td>
+                <td>LKR {{ number_format($payingAmount, 2) }}</td>
             </tr>
             <tr>
                 <td colspan="4">Return Amount</td>
-                <td>¥{{ number_format($returnAmount, 2) }}</td>
+                <td>LKR {{ number_format($returnAmount, 2) }}</td>
             </tr>
         </tbody>
     </table>

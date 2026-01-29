@@ -69,13 +69,13 @@
         <p><strong>To:</strong> {{ $endDate }}</p>
 
         <div class="summary">
-            <p><strong>Total Sales:</strong> ¥{{ number_format($totalSales, 2) }}</p>
+            <p><strong>Total Sales:</strong> LKR {{ number_format($totalSales, 2) }}</p>
             <p><strong>Total Orders:</strong> {{ $totalOrders }}</p>
             <p><strong>Total Items Sold:</strong> {{ $totalItems }}</p>
-            <p><strong>Average Order Value:</strong> ¥{{ $averageOrderValue }}</p>
+            <p><strong>Average Order Value:</strong> LKR {{ $averageOrderValue }}</p>
             <p><strong>Most Sold Item:</strong> {{ $mostSoldItem ?? 'N/A' }}</p>
-            <p><strong>Cost:</strong> ¥{{ number_format($totalCost, 2) }}</p>
-            <p><strong>Profit:</strong> ¥{{ number_format($profit, 2) }}</p>
+            <p><strong>Cost:</strong> LKR {{ number_format($totalCost, 2) }}</p>
+            <p><strong>Profit:</strong> LKR {{ number_format($profit, 2) }}</p>
         </div>
 
         <table>
@@ -90,7 +90,7 @@
             <tbody>
                 <tr>
                     <td>{{ ucfirst($platformType) }}</td>
-                    <td>¥{{ number_format($totalSales, 2) }}</td>
+                    <td>LKR {{ number_format($totalSales, 2) }}</td>
                     <td>{{ $totalOrders }}</td>
                     <td>{{ $totalItems }}</td>
                 </tr>
@@ -115,9 +115,9 @@
                     <tr>
                         <td>{{ $item['product_name'] }}</td>
                         <td>{{ $item['total_quantity'] }}</td>
-                        <td>¥{{ number_format($item['unit_price'], 2) }}</td>
-                        <td>¥{{ number_format($item['unit_cost'], 2) }}</td>
-                        <td>¥{{ number_format($item['unit_price']*$item['total_quantity'], 2) }}</td>
+                        <td>LKR {{ number_format($item['unit_price'], 2) }}</td>
+                        <td>LKR {{ number_format($item['unit_cost'], 2) }}</td>
+                        <td>LKR {{ number_format($item['unit_price']*$item['total_quantity'], 2) }}</td>
                     </tr>
                 @empty
                     <tr>

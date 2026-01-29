@@ -18,7 +18,7 @@
     <div class="summary">
         <p><strong>Total Stock Items:</strong> {{ $totalStockCount }}</p>
         <p><strong>Total Quantity:</strong> {{ $totalQuantity }}</p>
-        <p><strong>Total Value:</strong> ¥{{ number_format($totalValue, 2) }}</p>
+        <p><strong>Total Value:</strong> LKR {{ number_format($totalValue, 2) }}</p>
         <p><strong>Low Stock Count:</strong> {{ $lowStockCount }}</p>
     </div>
     <table>
@@ -39,8 +39,8 @@
                     <td>{{ $stock->barcode }}</td>
                     <td>{{ $stock->quantity }}</td>
                     <td>{{ $stock->alert_quantity }}</td>
-                    <td>¥{{ number_format($stock->pos_price, 2) }}</td>
-                    <td>¥{{ number_format($stock->quantity * $stock->pos_price, 2) }}</td>
+                    <td>LKR {{ number_format($stock->pos_price, 2) }}</td>
+                    <td>LKR {{ number_format($stock->quantity * $stock->pos_price, 2) }}</td>
                 </tr>
             @empty
                 <tr>
@@ -49,10 +49,10 @@
             @endforelse
         </tbody>
                 {{-- <div class="summary">
-            <p><strong>Total Stock Value:</strong> ¥{{ number_format($totalValue, 2) }}</p>
+            <p><strong>Total Stock Value:</strong> LKR {{ number_format($totalValue, 2) }}</p>
             <p><strong>Total Stock Items:</strong> {{ $totalStockCount }}</p>
             <p><strong>Total Quantity in Stock:</strong> {{ $totalQuantity }}</p>
-            <p><strong>Average Stock Value:</strong> ¥{{ $averageStockValue }}</p>
+            <p><strong>Average Stock Value:</strong> LKR {{ $averageStockValue }}</p>
             <p><strong>Most Stocked Product:</strong> {{ $mostStockedProduct ?? 'N/A' }}</p>
             <p><strong>Product with Highest Value:</strong> {{ $highestValueProduct ?? 'N/A' }}</p>
             <p><strong>Low Stock Count:</strong> {{ $lowStockCount }}</p>

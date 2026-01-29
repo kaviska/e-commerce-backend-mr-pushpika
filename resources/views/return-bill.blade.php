@@ -140,7 +140,7 @@
             @endforeach
             <tr class="data-section">
                 <td colspan="4" class="line">Total Return</td>
-                <td>¥{{ number_format($total_return_amount, 2) }}</td>
+                <td>LKR {{ number_format($total_return_amount, 2) }}</td>
             </tr>
         </tbody>
     </table>

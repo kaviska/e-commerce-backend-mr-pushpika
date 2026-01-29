@@ -163,7 +163,7 @@
                         <td>{{ $item->unit_price }}</td>
                         <td>{{ $item->unit_quantity }}</td>
 
-                        <td>¥ {{ number_format($item->unit_price * $item->unit_quantity, 2) }}</td>
+                        <td>LKR  {{ number_format($item->unit_price * $item->unit_quantity, 2) }}</td>
                     </tr>
                 @endforeach
 
@@ -175,23 +175,23 @@
             <table>
                 <tr>
                     <td>Subtotal:</td>
-                    <td>¥{{ $order->subtotal }}</td>
+                    <td>LKR {{ $order->subtotal }}</td>
                 </tr>
                 <tr>
                     <td>Tax:</td>
-                    <td>¥{{ $order->tax }}</td>
+                    <td>LKR {{ $order->tax }}</td>
                 </tr>
                 <tr>
                     <td>Shipping:</td>
-                    <td>¥{{ $order->shipping_cost }}</td>
+                    <td>LKR {{ $order->shipping_cost }}</td>
                 </tr>
                 <tr>
                     <td>Total Discount :</td>
-                    <td>¥{{ $order->total_discount }}</td>
+                    <td>LKR {{ $order->total_discount }}</td>
                 </tr>
                 <tr>
                     <td >Total:</td>
-                    <td >¥{{ $order->total }}</td>
+                    <td >LKR {{ $order->total }}</td>
                 </tr>
             </table>
         </div>

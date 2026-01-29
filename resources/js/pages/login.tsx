@@ -21,8 +21,23 @@ const Login = () => {
     rememberMe: false
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string; mathCaptcha?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [mathCaptcha, setMathCaptcha] = useState({ num1: 0, num2: 0, answer: 0 });
+  const [userAnswer, setUserAnswer] = useState('');
+
+  // Generate math captcha on component mount
+  React.useEffect(() => {
+    generateMathCaptcha();
+  }, []);
+
+  const generateMathCaptcha = () => {
+    const num1 = Math.floor(Math.random() * 10) + 1;
+    const num2 = Math.floor(Math.random() * 10) + 1;
+    const answer = num1 + num2;
+    setMathCaptcha({ num1, num2, answer });
+    setUserAnswer('');
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -38,7 +53,7 @@ const Login = () => {
   };
 
   const validateForm = () => {
-    const newErrors: { email?: string; password?: string } = {};
+    const newErrors: { email?: string; password?: string; mathCaptcha?: string } = {};
     
     if (!formData.email) {
       newErrors.email = 'Email is required';
@@ -50,6 +65,13 @@ const Login = () => {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
+    }
+
+    if (!userAnswer) {
+      newErrors.mathCaptcha = 'Please solve the math problem';
+    } else if (parseInt(userAnswer) !== mathCaptcha.answer) {
+      newErrors.mathCaptcha = 'Incorrect answer, please try again';
+      generateMathCaptcha();
     }
     
     setErrors(newErrors);
@@ -192,6 +214,51 @@ const Login = () => {
               </div>
               {errors.password && (
                 <p className="mt-2 text-sm text-red-600">{errors.password}</p>
+              )}
+            </div>
+
+            {/* Math Captcha */}
+            <div>
+              <label htmlFor="mathCaptcha" className="block text-sm font-medium text-gray-700 mb-2">
+                Verify you're human
+              </label>
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 bg-gray-100 p-4 rounded-xl border border-gray-300">
+                    <span className="text-2xl font-bold text-gray-800">
+                      {mathCaptcha.num1} + {mathCaptcha.num2} = ?
+                    </span>
+                  </div>
+                </div>
+                <div className="w-32">
+                  <input
+                    id="mathCaptcha"
+                    name="mathCaptcha"
+                    type="number"
+                    value={userAnswer}
+                    onChange={(e) => {
+                      setUserAnswer(e.target.value);
+                      if (errors.mathCaptcha) {
+                        setErrors(prev => ({ ...prev, mathCaptcha: '' }));
+                      }
+                    }}
+                    className={`block w-full px-3 py-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors ${
+                      errors.mathCaptcha ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    placeholder="Answer"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={generateMathCaptcha}
+                  className="px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-colors"
+                  title="Generate new problem"
+                >
+                  🔄
+                </button>
+              </div>
+              {errors.mathCaptcha && (
+                <p className="mt-2 text-sm text-red-600">{errors.mathCaptcha}</p>
               )}
             </div>
 

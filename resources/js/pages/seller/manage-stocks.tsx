@@ -333,11 +333,11 @@ const ManageStocks = () => {
                                             <td className="px-6 py-4">
                                                 <div className="space-y-1">
                                                     <div className="font-medium text-gray-900">
-                                                        ¥{stock.web_price.toLocaleString()}
+                                                        LKR {stock.web_price.toLocaleString()}
                                                     </div>
                                                     {stock.web_discount > 0 && (
                                                         <div className="text-sm text-green-600 font-medium">
-                                                            Final: ¥{(stock.web_price - stock.web_discount).toLocaleString()}
+                                                            Final: LKR {(stock.web_price - stock.web_discount).toLocaleString()}
                                                         </div>
                                                     )}
                                                 </div>
@@ -345,7 +345,7 @@ const ManageStocks = () => {
                                             <td className="px-6 py-4">
                                                 {stock.web_discount > 0 ? (
                                                     <Badge className="bg-red-100 text-red-700 hover:bg-red-200 border-red-200">
-                                                        -¥{stock.web_discount.toLocaleString()}
+                                                        -LKR {stock.web_discount.toLocaleString()}
                                                     </Badge>
                                                 ) : (
                                                     <span className="text-gray-400 text-xs">No discount</span>
@@ -457,7 +457,7 @@ const ManageStocks = () => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="web_price">Price (¥)</Label>
+                                    <Label htmlFor="web_price">Price (LKR )</Label>
                                     <Input 
                                         id="web_price" 
                                         type="number"
@@ -472,7 +472,7 @@ const ManageStocks = () => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="web_discount">Discount Amount (¥)</Label>
+                                    <Label htmlFor="web_discount">Discount Amount (LKR )</Label>
                                     <Input 
                                         id="web_discount" 
                                         type="number"
@@ -492,17 +492,17 @@ const ManageStocks = () => {
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
                                         <span className="text-sm text-gray-600">Original Price:</span>
-                                        <span className="text-lg font-medium text-gray-900">¥{Number(formData.web_price).toFixed(2)}</span>
+                                        <span className="text-lg font-medium text-gray-900">LKR {Number(formData.web_price).toFixed(2)}</span>
                                     </div>
                                     {formData.web_discount > 0 && (
                                         <>
                                             <div className="flex items-center justify-between">
                                                 <span className="text-sm text-gray-600">Discount:</span>
-                                                <span className="text-lg font-medium text-red-600">-¥{Number(formData.web_discount).toFixed(2)}</span>
+                                                <span className="text-lg font-medium text-red-600">-LKR {Number(formData.web_discount).toFixed(2)}</span>
                                             </div>
                                             <div className="border-t border-green-300 pt-2 flex items-center justify-between">
                                                 <span className="text-sm font-medium text-gray-700">Final Price:</span>
-                                                <span className="text-xl font-bold text-green-700">¥{(Number(formData.web_price) - Number(formData.web_discount)).toFixed(2)}</span>
+                                                <span className="text-xl font-bold text-green-700">LKR {(Number(formData.web_price) - Number(formData.web_discount)).toFixed(2)}</span>
                                             </div>
                                         </>
                                     )}

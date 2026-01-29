@@ -78,13 +78,10 @@ const SellerSidebar = ({ className }: SidebarProps) => {
                 { name: 'Variations', href: '/seller/variations', icon: GitBranch },
             ]
         },
-        { name: 'Orders', href: '/seller/orders', icon: ShoppingBag },
         { name: 'Hero Sliders', href: '/seller/hero-sliders', icon: Image },
-        { name: 'Analytics', href: '/seller/analytics', icon: BarChart3 },
         { name: 'Notifications', href: '/seller/notifications', icon: Bell },
         { name: 'Admin Users', href: '/seller/users', icon: Users },
-        { name: 'Shop Settings', href: '/seller/settings', icon: Store },
-        { name: 'Account', href: '/seller/profile', icon: Settings },
+      
     ];
 
     return (
