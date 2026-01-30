@@ -3,7 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import SellerLayout from '@/Layouts/SellerLayout';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { 
+import {
     Search,
     Loader2,
     Pencil,
@@ -13,7 +13,8 @@ import {
     ImageIcon,
     DollarSign,
     Archive,
-    X
+    X,
+    Percent
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -87,12 +88,13 @@ const ManageStocks = () => {
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [deletingId, setDeletingId] = useState<number | null>(null);
     const [isUpdating, setIsUpdating] = useState(false);
-    
+
     // Edit form state
     const [formData, setFormData] = useState({
         quantity: 0,
         web_price: 0,
-        web_discount: 0
+        web_discount: 0,
+        discount_type: 'currency' as 'percentage' | 'currency'
     });
 
     useEffect(() => {
@@ -123,16 +125,17 @@ const ManageStocks = () => {
         setFormData({
             quantity: Number(stock.quantity),
             web_price: Number(stock.web_price),
-            web_discount: Number(stock.web_discount)
+            web_discount: Number(stock.web_discount),
+            discount_type: 'currency'
         });
-        
+
         // Set image preview if variation stock has image
         if (stock.variation_stocks && stock.variation_stocks.length > 0 && stock.variation_stocks[0].image) {
             setImagePreview('/' + stock.variation_stocks[0].image);
         } else {
             setImagePreview(null);
         }
-        
+
         setIsEditOpen(true);
     };
 
@@ -155,7 +158,9 @@ const ManageStocks = () => {
                 quantity: formData.quantity,
                 web_price: formData.web_price,
                 pos_price: currentStock.pos_price,
-                web_discount: formData.web_discount,
+                web_discount: formData.discount_type === 'percentage'
+                    ? (formData.web_price * formData.web_discount) / 100
+                    : formData.web_discount,
                 pos_discount: 0
             };
 
@@ -207,7 +212,8 @@ const ManageStocks = () => {
         setFormData({
             quantity: 0,
             web_price: 0,
-            web_discount: 0
+            web_discount: 0,
+            discount_type: 'currency'
         });
         setImagePreview(null);
         setSelectedImage(null);
@@ -232,7 +238,7 @@ const ManageStocks = () => {
     return (
         <SellerLayout>
             <Head title="Manage Stocks | Seller Center" />
-            
+
             <div className="space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
@@ -246,8 +252,8 @@ const ManageStocks = () => {
                     <div className="p-4 border-b border-gray-200 bg-gray-50">
                         <div className="relative max-w-sm">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                            <Input 
-                                placeholder="Search stocks..." 
+                            <Input
+                                placeholder="Search stocks..."
                                 className="pl-9 bg-white"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -290,9 +296,9 @@ const ManageStocks = () => {
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-4">
                                                     <div className="h-16 w-16 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden border border-gray-200">
-                                                        <img 
-                                                            src={stock.product?.primary_image ? '/' + stock.product.primary_image : 'https://via.placeholder.com/64?text=No+Image'} 
-                                                            alt={stock.product?.name || 'Product'} 
+                                                        <img
+                                                            src={stock.product?.primary_image ? '/' + stock.product.primary_image : 'https://via.placeholder.com/64?text=No+Image'}
+                                                            alt={stock.product?.name || 'Product'}
                                                             className="h-full w-full object-cover"
                                                             onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/64?text=No+Img' }}
                                                         />
@@ -394,9 +400,9 @@ const ManageStocks = () => {
                                 <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
                                     <div className="flex items-center gap-4">
                                         <div className="h-20 w-20 flex-shrink-0 bg-white rounded-md overflow-hidden border border-blue-200">
-                                            <img 
-                                                src={currentStock.product?.primary_image ? '/' + currentStock.product.primary_image : 'https://via.placeholder.com/80?text=No+Image'} 
-                                                alt={currentStock.product?.name || 'Product'} 
+                                            <img
+                                                src={currentStock.product?.primary_image ? '/' + currentStock.product.primary_image : 'https://via.placeholder.com/80?text=No+Image'}
+                                                alt={currentStock.product?.name || 'Product'}
                                                 className="h-full w-full object-cover"
                                             />
                                         </div>
@@ -424,9 +430,9 @@ const ManageStocks = () => {
                                             <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                                         </div>
                                     )}
-                                    <Input 
-                                        id="image" 
-                                        type="file" 
+                                    <Input
+                                        id="image"
+                                        type="file"
                                         accept="image/*"
                                         onChange={handleImageChange}
                                         className="cursor-pointer bg-white"
@@ -439,13 +445,13 @@ const ManageStocks = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2 col-span-2">
                                     <Label htmlFor="quantity">Quantity</Label>
-                                    <Input 
-                                        id="quantity" 
+                                    <Input
+                                        id="quantity"
                                         type="number"
                                         min="0"
                                         required
-                                        value={formData.quantity} 
-                                        onChange={(e) => setFormData({...formData, quantity: parseInt(e.target.value) || 0})}
+                                        value={formData.quantity}
+                                        onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })}
                                         placeholder="Stock quantity"
                                         className="bg-white"
                                     />
@@ -458,31 +464,61 @@ const ManageStocks = () => {
 
                                 <div className="space-y-2">
                                     <Label htmlFor="web_price">Price (LKR )</Label>
-                                    <Input 
-                                        id="web_price" 
+                                    <Input
+                                        id="web_price"
                                         type="number"
                                         min="0"
                                         step="0.01"
                                         required
-                                        value={formData.web_price} 
-                                        onChange={(e) => setFormData({...formData, web_price: parseFloat(e.target.value) || 0})}
+                                        value={formData.web_price}
+                                        onChange={(e) => setFormData({ ...formData, web_price: parseFloat(e.target.value) || 0 })}
                                         placeholder="0.00"
                                         className="bg-white"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="web_discount">Discount Amount (LKR )</Label>
-                                    <Input 
-                                        id="web_discount" 
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        value={formData.web_discount} 
-                                        onChange={(e) => setFormData({...formData, web_discount: parseFloat(e.target.value) || 0})}
-                                        placeholder="0.00"
-                                        className="bg-white"
-                                    />
+                                    <Label htmlFor="web_discount">Discount</Label>
+                                    <div className="flex gap-2">
+                                        <div className="relative flex-1">
+                                            <Input
+                                                id="web_discount"
+                                                type="number"
+                                                min="0"
+                                                step="0.01"
+                                                max={formData.discount_type === 'percentage' ? 100 : formData.web_price}
+                                                value={formData.web_discount}
+                                                onChange={(e) => setFormData({ ...formData, web_discount: parseFloat(e.target.value) || 0 })}
+                                                placeholder={formData.discount_type === 'percentage' ? "10" : "0.00"}
+                                                className="bg-white pr-8"
+                                            />
+                                            {formData.discount_type === 'percentage' && (
+                                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">%</span>
+                                            )}
+                                        </div>
+                                        <div className="flex bg-gray-100 rounded-lg p-1 h-10 border border-gray-200">
+                                            <button
+                                                type="button"
+                                                onClick={() => setFormData({ ...formData, discount_type: 'percentage', web_discount: 0 })}
+                                                className={`px-3 rounded-md text-sm font-medium transition-all ${formData.discount_type === 'percentage'
+                                                    ? 'bg-white text-gray-900 shadow-sm'
+                                                    : 'text-gray-500 hover:text-gray-700'
+                                                    }`}
+                                            >
+                                                <Percent className="h-4 w-4" />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setFormData({ ...formData, discount_type: 'currency', web_discount: 0 })}
+                                                className={`px-3 rounded-md text-sm font-medium transition-all ${formData.discount_type === 'currency'
+                                                    ? 'bg-white text-green-700 shadow-sm'
+                                                    : 'text-gray-500 hover:text-gray-700'
+                                                    }`}
+                                            >
+                                                <span className="text-xs font-bold">LKR</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -498,11 +534,21 @@ const ManageStocks = () => {
                                         <>
                                             <div className="flex items-center justify-between">
                                                 <span className="text-sm text-gray-600">Discount:</span>
-                                                <span className="text-lg font-medium text-red-600">-LKR {Number(formData.web_discount).toFixed(2)}</span>
+                                                <span className="text-lg font-medium text-red-600">
+                                                    {formData.discount_type === 'percentage'
+                                                        ? `${formData.web_discount}% (-LKR ${(Number(formData.web_price) * Number(formData.web_discount) / 100).toFixed(2)})`
+                                                        : `-LKR ${Number(formData.web_discount).toFixed(2)}`
+                                                    }
+                                                </span>
                                             </div>
                                             <div className="border-t border-green-300 pt-2 flex items-center justify-between">
                                                 <span className="text-sm font-medium text-gray-700">Final Price:</span>
-                                                <span className="text-xl font-bold text-green-700">LKR {(Number(formData.web_price) - Number(formData.web_discount)).toFixed(2)}</span>
+                                                <span className="text-xl font-bold text-green-700">
+                                                    {formData.discount_type === 'percentage'
+                                                        ? `LKR ${(Number(formData.web_price) * (1 - Number(formData.web_discount) / 100)).toFixed(2)}`
+                                                        : `LKR ${(Number(formData.web_price) - Number(formData.web_discount)).toFixed(2)}`
+                                                    }
+                                                </span>
                                             </div>
                                         </>
                                     )}
