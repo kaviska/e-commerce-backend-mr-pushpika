@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    Package, 
-    Layers, 
-    Tag, 
-    Plus, 
+import {
+    Package,
+    Layers,
+    Tag,
+    Plus,
     Check,
     X,
     Trash2,
     AlertCircle,
     Edit3,
     Image as ImageIcon,
-    FileText
+    FileText,
+    Percent,
+    DollarSign,
+    RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +28,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import FormGenerator from '@/components/custom/tools/FormGenerator';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { api } from '@/hooks/api/api';
@@ -44,6 +48,7 @@ interface Product {
         name: string;
     };
     web_price?: number;
+    description?: string;
 }
 
 interface VariationOption {
@@ -95,10 +100,10 @@ interface StockModalProps {
     isNew?: boolean;
 }
 
-const StockModal: React.FC<StockModalProps> = ({ 
-    isOpen, 
-    onClose, 
-    product, 
+const StockModal: React.FC<StockModalProps> = ({
+    isOpen,
+    onClose,
+    product,
     onSuccess,
     setIsVariationModalOpen,
     setIsBrandModalOpen,
@@ -110,7 +115,7 @@ const StockModal: React.FC<StockModalProps> = ({
     const [hasVariations, setHasVariations] = useState<'yes' | 'no'>('no');
     const [variationStocks, setVariationStocks] = useState<VariationStock[]>([]);
     const [variationImageKey, setVariationImageKey] = useState(0);
-    
+
     // Product details editing
     const [isEditingProduct, setIsEditingProduct] = useState(false);
     const [productDetails, setProductDetails] = useState({
@@ -120,12 +125,13 @@ const StockModal: React.FC<StockModalProps> = ({
         category_id: 0,
         primary_image: [] as File[],
     });
-    
+
     // Simple stock form (no variations)
     const [simpleStock, setSimpleStock] = useState({
         quantity: 0,
         web_price: 0,
         web_discount: 0,
+        discount_type: 'currency' as 'percentage' | 'currency',
         images: [] as File[],
     });
 
@@ -135,15 +141,17 @@ const StockModal: React.FC<StockModalProps> = ({
         quantity: number;
         web_price: number;
         web_discount: number;
+        discount_type: 'percentage' | 'currency';
         images: File[];
     }>({
         selectedVariations: [],
         quantity: 0,
         web_price: 0,
         web_discount: 0,
+        discount_type: 'currency',
         images: [],
     });
-    
+
     // Image Previews
     const [productImagePreview, setProductImagePreview] = useState<string | null>(null);
     const [simpleStockImagePreview, setSimpleStockImagePreview] = useState<string | null>(null);
@@ -164,6 +172,7 @@ const StockModal: React.FC<StockModalProps> = ({
                 quantity: 0,
                 web_price: product.web_price || 0,
                 web_discount: 0,
+                discount_type: 'currency',
                 images: [],
             });
             setVariationStocks([]);
@@ -172,6 +181,7 @@ const StockModal: React.FC<StockModalProps> = ({
                 quantity: 0,
                 web_price: product.web_price || 0,
                 web_discount: 0,
+                discount_type: 'currency',
                 images: [],
             });
             setProductImagePreview(null);
@@ -179,6 +189,14 @@ const StockModal: React.FC<StockModalProps> = ({
             setVariationImagePreview(null);
         }
     }, [product, isOpen]);
+
+    // Helper to calculate discount value in currency
+    const calculateCurrencyDiscount = (price: number, discount: number, type: 'percentage' | 'currency') => {
+        if (type === 'percentage') {
+            return (price * discount) / 100;
+        }
+        return discount;
+    };
 
     const handleStockSubmit = async () => {
         if (!product) return;
@@ -202,7 +220,7 @@ const StockModal: React.FC<StockModalProps> = ({
                 productFormData.append('category_id', productDetails.category_id.toString());
                 productFormData.append('brand_id', productDetails.brand_id.toString());
                 productFormData.append('user_id', userId.toString());
-                
+
                 // Add primary image if available
                 if (productDetails.primary_image.length > 0) {
                     productFormData.append('primary_image', productDetails.primary_image[0]);
@@ -213,7 +231,7 @@ const StockModal: React.FC<StockModalProps> = ({
                 }
 
                 toast.loading('Creating product...');
-                
+
                 const productResponse = await api.post('/products', productFormData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
@@ -231,7 +249,7 @@ const StockModal: React.FC<StockModalProps> = ({
                 // Use existing product ID
                 newProductId = product.id;
             }
-            
+
             toast.dismiss();
             toast.loading('Adding stock...');
 
@@ -244,16 +262,23 @@ const StockModal: React.FC<StockModalProps> = ({
                     return;
                 }
 
+                // Calculate final discount value in currency
+                const finalDiscount = calculateCurrencyDiscount(
+                    simpleStock.web_price,
+                    simpleStock.web_discount,
+                    simpleStock.discount_type
+                );
+
                 const formData = new FormData();
                 formData.append('product_id', newProductId.toString());
                 formData.append('quantity', simpleStock.quantity.toString());
                 formData.append('web_price', simpleStock.web_price.toString());
                 formData.append('pos_price', '0');
-                formData.append('web_discount', simpleStock.web_discount.toString());
+                formData.append('web_discount', finalDiscount.toString());
                 formData.append('pos_discount', '0');
                 formData.append('variations[]', '1'); // Default variation option ID
                 formData.append('user_id', userId.toString());
-                
+
                 // Add image if available
                 if (simpleStock.images.length > 0) {
                     formData.append('variation_images[]', simpleStock.images[0]);
@@ -264,7 +289,7 @@ const StockModal: React.FC<StockModalProps> = ({
                         'Content-Type': 'multipart/form-data',
                     }
                 });
-                
+
                 toast.dismiss();
                 toast.success('Product and stock added successfully');
                 onSuccess();
@@ -284,15 +309,15 @@ const StockModal: React.FC<StockModalProps> = ({
                     formData.append('quantity', varStock.quantity.toString());
                     formData.append('web_price', varStock.web_price.toString());
                     formData.append('pos_price', '0');
-                    formData.append('web_discount', varStock.web_discount.toString());
+                    formData.append('web_discount', varStock.web_discount.toString()); // Already converted to currency when added to list
                     formData.append('pos_discount', '0');
                     formData.append('user_id', userId.toString());
-                    
+
                     // Add variations
                     varStock.selectedVariations.forEach(varId => {
                         formData.append('variations[]', varId.toString());
                     });
-                    
+
                     // Add image if available (single image for all variations in this stock)
                     if (varStock.images.length > 0) {
                         formData.append('variation_images[]', varStock.images[0]);
@@ -329,7 +354,7 @@ const StockModal: React.FC<StockModalProps> = ({
         }
 
         // Check for duplicate variation combinations
-        const isDuplicate = variationStocks.some(stock => 
+        const isDuplicate = variationStocks.some(stock =>
             stock.selectedVariations.length === currentVariation.selectedVariations.length &&
             stock.selectedVariations.every(v => currentVariation.selectedVariations.includes(v))
         );
@@ -339,19 +364,28 @@ const StockModal: React.FC<StockModalProps> = ({
             return;
         }
 
+        // Calculate discount in currency for storage
+        const discountInCurrency = calculateCurrencyDiscount(
+            currentVariation.web_price,
+            currentVariation.web_discount,
+            currentVariation.discount_type
+        );
+
         const newStock: VariationStock = {
             id: Date.now().toString(),
             ...currentVariation,
+            web_discount: discountInCurrency, // Store as currency
         };
 
         setVariationStocks([...variationStocks, newStock]);
-        
+
         // Reset current variation and force image field to clear
         setCurrentVariation({
             selectedVariations: [],
             quantity: 0,
             web_price: product?.web_price || 0,
             web_discount: 0,
+            discount_type: 'currency',
             images: [],
         });
 
@@ -370,14 +404,14 @@ const StockModal: React.FC<StockModalProps> = ({
         setCurrentVariation(prev => {
             const exists = prev.selectedVariations.includes(id);
             if (exists) {
-                return { 
-                    ...prev, 
-                    selectedVariations: prev.selectedVariations.filter(v => v !== id) 
+                return {
+                    ...prev,
+                    selectedVariations: prev.selectedVariations.filter(v => v !== id)
                 };
             } else {
-                return { 
-                    ...prev, 
-                    selectedVariations: [...prev.selectedVariations, id] 
+                return {
+                    ...prev,
+                    selectedVariations: [...prev.selectedVariations, id]
                 };
             }
         });
@@ -420,19 +454,19 @@ const StockModal: React.FC<StockModalProps> = ({
                                 <FileText className="h-5 w-5 text-blue-600" />
                                 Product Details
                             </h3>
-                                {isNew && (
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => setIsEditingProduct(!isEditingProduct)}
-                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-100 h-8"
-                                    >
-                                        <Edit3 className="h-3.5 w-3.5 mr-1.5" />
-                                        {isEditingProduct ? 'View Mode' : 'Edit Product'}
-                                    </Button>
-                                )}
+                            {isNew && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setIsEditingProduct(!isEditingProduct)}
+                                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-100 h-8"
+                                >
+                                    <Edit3 className="h-3.5 w-3.5 mr-1.5" />
+                                    {isEditingProduct ? 'View Mode' : 'Edit Product'}
+                                </Button>
+                            )}
                         </div>
-                        
+
                         <div className="p-5 space-y-4">
                             {!isEditingProduct ? (
                                 /* View Mode */
@@ -469,7 +503,7 @@ const StockModal: React.FC<StockModalProps> = ({
                                             placeholder="Enter product name"
                                             className="h-11 bg-white border-blue-200 focus:border-blue-500 focus:ring-blue-500"
                                             value={productDetails.name}
-                                            onChange={(e) => setProductDetails({...productDetails, name: e.target.value})}
+                                            onChange={(e) => setProductDetails({ ...productDetails, name: e.target.value })}
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -492,7 +526,7 @@ const StockModal: React.FC<StockModalProps> = ({
                                                 label=""
                                                 type="selector"
                                                 value={productDetails.brand_id?.toString() || ''}
-                                                onChange={(e) => setProductDetails({...productDetails, brand_id: parseInt(e.target.value)})}
+                                                onChange={(e) => setProductDetails({ ...productDetails, brand_id: parseInt(e.target.value) })}
                                                 selectOptions={brands}
                                             />
                                         </div>
@@ -505,7 +539,7 @@ const StockModal: React.FC<StockModalProps> = ({
                                                 label=""
                                                 type="selector"
                                                 value={productDetails.category_id?.toString() || ''}
-                                                onChange={(e) => setProductDetails({...productDetails, category_id: parseInt(e.target.value)})}
+                                                onChange={(e) => setProductDetails({ ...productDetails, category_id: parseInt(e.target.value) })}
                                                 selectOptions={categories}
                                             />
                                         </div>
@@ -516,7 +550,7 @@ const StockModal: React.FC<StockModalProps> = ({
                                             placeholder="Enter product description..."
                                             className="min-h-[80px] bg-white border-blue-200 focus:border-blue-500 focus:ring-blue-500"
                                             value={productDetails.description}
-                                            onChange={(e) => setProductDetails({...productDetails, description: e.target.value})}
+                                            onChange={(e) => setProductDetails({ ...productDetails, description: e.target.value })}
                                         />
                                     </div>
 
@@ -540,9 +574,9 @@ const StockModal: React.FC<StockModalProps> = ({
                                             />
                                             {productImagePreview && (
                                                 <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-gray-200">
-                                                    <img 
-                                                        src={productImagePreview} 
-                                                        alt="Preview" 
+                                                    <img
+                                                        src={productImagePreview}
+                                                        alt="Preview"
                                                         className="w-full h-full object-cover"
                                                     />
                                                     <Button
@@ -609,19 +643,19 @@ const StockModal: React.FC<StockModalProps> = ({
                                 <Package className="h-5 w-5 text-green-600" />
                                 Stock Configuration
                             </h3>
-                            
+
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="space-y-2">
                                     <Label className="text-xs font-semibold text-gray-700 flex items-center gap-1">
                                         Quantity <span className="text-red-500">*</span>
                                     </Label>
-                                    <Input 
-                                        type="number" 
+                                    <Input
+                                        type="number"
                                         min="0"
                                         placeholder="100"
                                         className="h-11 bg-white border-gray-300 focus:border-green-500 focus:ring-green-500 font-medium"
                                         value={simpleStock.quantity || ''}
-                                        onChange={(e) => setSimpleStock({...simpleStock, quantity: parseInt(e.target.value) || 0})}
+                                        onChange={(e) => setSimpleStock({ ...simpleStock, quantity: parseInt(e.target.value) || 0 })}
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -629,51 +663,83 @@ const StockModal: React.FC<StockModalProps> = ({
                                         Price <span className="text-red-500">*</span>
                                     </Label>
                                     <div className="relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">LKR</span>
-                                        <Input 
-                                            type="number" 
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold"></span>
+                                        <Input
+                                            type="number"
                                             min="0"
                                             step="0.01"
                                             placeholder="99.99"
                                             className="pl-8 h-11 bg-white border-gray-300 focus:border-green-500 focus:ring-green-500 font-medium"
                                             value={simpleStock.web_price || ''}
-                                            onChange={(e) => setSimpleStock({...simpleStock, web_price: parseFloat(e.target.value) || 0})}
+                                            onChange={(e) => setSimpleStock({ ...simpleStock, web_price: parseFloat(e.target.value) || 0 })}
                                         />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-xs font-semibold text-gray-700">Discount</Label>
-                                    <div className="relative">
-                                        <Input 
-                                            type="number" 
-                                            min="0"
-                                            max="100"
-                                            placeholder="10"
-                                            className="pr-8 h-11 bg-white border-gray-300 focus:border-green-500 focus:ring-green-500 font-medium"
-                                            value={simpleStock.web_discount || ''}
-                                            onChange={(e) => setSimpleStock({...simpleStock, web_discount: parseFloat(e.target.value) || 0})}
-                                        />
-                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium"></span>
+                                    <div className="flex gap-2">
+                                        <div className="relative flex-1">
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                max={simpleStock.discount_type === 'percentage' ? 100 : simpleStock.web_price}
+                                                placeholder={simpleStock.discount_type === 'percentage' ? "10" : "50.00"}
+                                                className="pr-8 h-11 bg-white border-gray-300 focus:border-green-500 focus:ring-green-500 font-medium"
+                                                value={simpleStock.web_discount || ''}
+                                                onChange={(e) => setSimpleStock({ ...simpleStock, web_discount: parseFloat(e.target.value) || 0 })}
+                                            />
+                                            {simpleStock.discount_type === 'percentage' && (
+                                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">%</span>
+                                            )}
+                                        </div>
+                                        <div className="flex bg-gray-100 rounded-lg p-1 h-11 border border-gray-200">
+                                            <button
+                                                type="button"
+                                                onClick={() => setSimpleStock({ ...simpleStock, discount_type: 'percentage', web_discount: 0 })}
+                                                className={`px-3 rounded-md text-sm font-medium transition-all ${simpleStock.discount_type === 'percentage'
+                                                    ? 'bg-white text-gray-900 shadow-sm'
+                                                    : 'text-gray-500 hover:text-gray-700'
+                                                    }`}
+                                            >
+                                                <Percent className="h-4 w-4" />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setSimpleStock({ ...simpleStock, discount_type: 'currency', web_discount: 0 })}
+                                                className={`px-3 rounded-md text-sm font-medium transition-all ${simpleStock.discount_type === 'currency'
+                                                    ? 'bg-white text-green-700 shadow-sm'
+                                                    : 'text-gray-500 hover:text-gray-700'
+                                                    }`}
+                                            >
+                                                <span className="text-xs font-bold">LKR</span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            
+
                             {simpleStock.web_discount > 0 && simpleStock.web_price > 0 && (
                                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-300 rounded-lg p-4 flex items-center justify-between">
                                     <div>
                                         <p className="text-xs font-medium text-green-700 uppercase tracking-wider">Final Price After Discount</p>
                                         <p className="text-2xl font-bold text-green-600 mt-1">
-                                            ${(simpleStock.web_price * (1 - simpleStock.web_discount / 100)).toFixed(2)}
+                                            {simpleStock.discount_type === 'percentage'
+                                                ? `LKR ${(simpleStock.web_price * (1 - simpleStock.web_discount / 100)).toFixed(2)}`
+                                                : `LKR ${(simpleStock.web_price - simpleStock.web_discount).toFixed(2)}`
+                                            }
                                         </p>
                                     </div>
                                     <div className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold">
-                                        {simpleStock.web_discount} OFF
+                                        {simpleStock.discount_type === 'percentage'
+                                            ? `${simpleStock.web_discount}% OFF`
+                                            : `LKR ${simpleStock.web_discount} OFF`
+                                        }
                                     </div>
                                 </div>
                             )}
 
 
-                            
+
                             {/* Image Upload */}
                             <div className="space-y-2">
                                 <Label className="text-xs font-semibold text-gray-700 flex items-center gap-2">
@@ -695,9 +761,9 @@ const StockModal: React.FC<StockModalProps> = ({
                                     />
                                     {simpleStockImagePreview && (
                                         <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-gray-200">
-                                            <img 
-                                                src={simpleStockImagePreview} 
-                                                alt="Preview" 
+                                            <img
+                                                src={simpleStockImagePreview}
+                                                alt="Preview"
                                                 className="w-full h-full object-cover"
                                             />
                                             <Button
@@ -727,9 +793,9 @@ const StockModal: React.FC<StockModalProps> = ({
                                         <Layers className="h-4 w-4 text-green-600" />
                                         Select Variation Options
                                     </h3>
-                                    <Button 
-                                        variant="ghost" 
-                                        size="sm" 
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
                                         onClick={() => setIsVariationModalOpen(true)}
                                         className="text-green-600 hover:text-green-700 hover:bg-green-50 h-7 text-xs"
                                     >
@@ -737,7 +803,7 @@ const StockModal: React.FC<StockModalProps> = ({
                                         Create New
                                     </Button>
                                 </div>
-                                
+
                                 {groupedVariations.length > 0 ? (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {groupedVariations.map((group) => (
@@ -745,16 +811,15 @@ const StockModal: React.FC<StockModalProps> = ({
                                                 <h4 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">{group.variation_name}</h4>
                                                 <div className="space-y-1.5 max-h-[120px] overflow-y-auto">
                                                     {group.options.map((option) => (
-                                                        <label 
-                                                            key={option.id} 
-                                                            className={`flex items-center space-x-2 p-2 rounded-md transition-all cursor-pointer ${
-                                                                currentVariation.selectedVariations.includes(option.id)
-                                                                    ? 'bg-green-100 border border-green-300' 
-                                                                    : 'bg-white hover:bg-gray-100 border border-transparent'
-                                                            }`}
+                                                        <label
+                                                            key={option.id}
+                                                            className={`flex items-center space-x-2 p-2 rounded-md transition-all cursor-pointer ${currentVariation.selectedVariations.includes(option.id)
+                                                                ? 'bg-green-100 border border-green-300'
+                                                                : 'bg-white hover:bg-gray-100 border border-transparent'
+                                                                }`}
                                                         >
-                                                            <Checkbox 
-                                                                id={`var-${option.id}`} 
+                                                            <Checkbox
+                                                                id={`var-${option.id}`}
                                                                 checked={currentVariation.selectedVariations.includes(option.id)}
                                                                 onCheckedChange={() => toggleVariationSelection(option.id)}
                                                                 className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
@@ -772,10 +837,10 @@ const StockModal: React.FC<StockModalProps> = ({
                                     <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
                                         <Layers className="h-8 w-8 text-gray-300 mx-auto mb-2" />
                                         <p className="text-sm text-gray-500 mb-2">No variation options available</p>
-                                        <Button 
-                                            variant="outline" 
-                                            size="sm" 
-                                            onClick={() => setIsVariationModalOpen(true)} 
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setIsVariationModalOpen(true)}
                                             className="text-green-600 border-green-600 hover:bg-green-50"
                                         >
                                             <Plus className="h-3 w-3 mr-1" />
@@ -796,13 +861,13 @@ const StockModal: React.FC<StockModalProps> = ({
                                         <Label className="text-xs font-semibold text-gray-700 flex items-center gap-1">
                                             Quantity <span className="text-red-500">*</span>
                                         </Label>
-                                        <Input 
-                                            type="number" 
+                                        <Input
+                                            type="number"
                                             min="0"
                                             placeholder="50"
                                             className="h-11 bg-white border-gray-300 focus:border-green-500 focus:ring-green-500 font-medium"
                                             value={currentVariation.quantity || ''}
-                                            onChange={(e) => setCurrentVariation({...currentVariation, quantity: parseInt(e.target.value) || 0})}
+                                            onChange={(e) => setCurrentVariation({ ...currentVariation, quantity: parseInt(e.target.value) || 0 })}
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -810,31 +875,57 @@ const StockModal: React.FC<StockModalProps> = ({
                                             Price <span className="text-red-500">*</span>
                                         </Label>
                                         <div className="relative">
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">LKR</span>
-                                            <Input 
-                                                type="number" 
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold"></span>
+                                            <Input
+                                                type="number"
                                                 min="0"
                                                 step="0.01"
                                                 placeholder="99.99"
                                                 className="pl-8 h-11 bg-white border-gray-300 focus:border-green-500 focus:ring-green-500 font-medium"
                                                 value={currentVariation.web_price || ''}
-                                                onChange={(e) => setCurrentVariation({...currentVariation, web_price: parseFloat(e.target.value) || 0})}
+                                                onChange={(e) => setCurrentVariation({ ...currentVariation, web_price: parseFloat(e.target.value) || 0 })}
                                             />
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-semibold text-gray-700">Discount (%)</Label>
-                                        <div className="relative">
-                                            <Input 
-                                                type="number" 
-                                                min="0"
-                                                max="100"
-                                                placeholder="10"
-                                                className="pr-8 h-11 bg-white border-gray-300 focus:border-green-500 focus:ring-green-500 font-medium"
-                                                value={currentVariation.web_discount || ''}
-                                                onChange={(e) => setCurrentVariation({...currentVariation, web_discount: parseFloat(e.target.value) || 0})}
-                                            />
-                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium"></span>
+                                        <Label className="text-xs font-semibold text-gray-700">Discount</Label>
+                                        <div className="flex gap-2">
+                                            <div className="relative flex-1">
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    max={currentVariation.discount_type === 'percentage' ? 100 : currentVariation.web_price}
+                                                    placeholder={currentVariation.discount_type === 'percentage' ? "10" : "50.00"}
+                                                    className="pr-8 h-11 bg-white border-gray-300 focus:border-green-500 focus:ring-green-500 font-medium"
+                                                    value={currentVariation.web_discount || ''}
+                                                    onChange={(e) => setCurrentVariation({ ...currentVariation, web_discount: parseFloat(e.target.value) || 0 })}
+                                                />
+                                                {currentVariation.discount_type === 'percentage' && (
+                                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">%</span>
+                                                )}
+                                            </div>
+                                            <div className="flex bg-gray-100 rounded-lg p-1 h-11 border border-gray-200">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setCurrentVariation({ ...currentVariation, discount_type: 'percentage', web_discount: 0 })}
+                                                    className={`px-3 rounded-md text-sm font-medium transition-all ${currentVariation.discount_type === 'percentage'
+                                                        ? 'bg-white text-gray-900 shadow-sm'
+                                                        : 'text-gray-500 hover:text-gray-700'
+                                                        }`}
+                                                >
+                                                    <Percent className="h-4 w-4" />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setCurrentVariation({ ...currentVariation, discount_type: 'currency', web_discount: 0 })}
+                                                    className={`px-3 rounded-md text-sm font-medium transition-all ${currentVariation.discount_type === 'currency'
+                                                        ? 'bg-white text-green-700 shadow-sm'
+                                                        : 'text-gray-500 hover:text-gray-700'
+                                                        }`}
+                                                >
+                                                    <span className="text-xs font-bold">LKR</span>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -861,9 +952,9 @@ const StockModal: React.FC<StockModalProps> = ({
                                         />
                                         {variationImagePreview && (
                                             <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-gray-200">
-                                                <img 
-                                                    src={variationImagePreview} 
-                                                    alt="Preview" 
+                                                <img
+                                                    src={variationImagePreview}
+                                                    alt="Preview"
                                                     className="w-full h-full object-cover"
                                                 />
                                                 <Button
@@ -883,7 +974,7 @@ const StockModal: React.FC<StockModalProps> = ({
                                     </div>
                                 </div>
 
-                                <Button 
+                                <Button
                                     onClick={addVariationStock}
                                     className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white h-12 text-base font-semibold shadow-lg shadow-green-200"
                                     disabled={currentVariation.selectedVariations.length === 0}
@@ -921,7 +1012,7 @@ const StockModal: React.FC<StockModalProps> = ({
                                                             </div>
                                                         </div>
                                                     )}
-                                                    
+
                                                     <div className="flex-1 min-w-0">
                                                         <p className="font-bold text-base text-gray-900 truncate mb-2">
                                                             {getVariationNames(stock.selectedVariations)}
@@ -931,11 +1022,11 @@ const StockModal: React.FC<StockModalProps> = ({
                                                                 Qty: {stock.quantity}
                                                             </span>
                                                             <span className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold border border-green-200">
-                                                                ${stock.web_price}
+                                                                LKR {stock.web_price}
                                                             </span>
                                                             {stock.web_discount > 0 && (
                                                                 <span className="bg-gradient-to-r from-orange-100 to-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold border border-red-200">
-                                                                    {stock.web_discount} OFF
+                                                                    LKR {stock.web_discount} OFF
                                                                 </span>
                                                             )}
                                                             {stock.images.length > 0 && (
@@ -946,9 +1037,9 @@ const StockModal: React.FC<StockModalProps> = ({
                                                             )}
                                                         </div>
                                                     </div>
-                                                    
-                                                    <Button 
-                                                        variant="ghost" 
+
+                                                    <Button
+                                                        variant="ghost"
                                                         size="sm"
                                                         onClick={() => removeVariationStock(stock.id)}
                                                         className="text-red-600 hover:text-red-700 hover:bg-red-50 h-9 w-9 p-0 shrink-0 rounded-lg border border-red-200"
@@ -979,13 +1070,13 @@ const StockModal: React.FC<StockModalProps> = ({
                         <Button variant="outline" onClick={onClose} className="h-11 px-8 font-semibold border-2">
                             Cancel
                         </Button>
-                        <Button 
-                            onClick={handleStockSubmit} 
+                        <Button
+                            onClick={handleStockSubmit}
                             className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 hover:from-green-700 hover:via-emerald-700 hover:to-teal-700 text-white h-11 px-10 shadow-lg shadow-green-300 font-bold text-base"
                             disabled={hasVariations === 'yes' && variationStocks.length === 0}
                         >
                             <Check className="h-5 w-5 mr-2" />
-                            {hasVariations === 'yes' 
+                            {hasVariations === 'yes'
                                 ? `Submit ${variationStocks.length} Stock${variationStocks.length !== 1 ? 's' : ''}`
                                 : 'Add Stock to Inventory'
                             }
@@ -993,7 +1084,7 @@ const StockModal: React.FC<StockModalProps> = ({
                     </div>
                 </DialogFooter>
             </DialogContent>
-        </Dialog>
+        </Dialog >
     );
 };
 
