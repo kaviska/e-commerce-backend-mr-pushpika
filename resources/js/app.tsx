@@ -7,7 +7,7 @@ import { initializeTheme } from './hooks/use-appearance';
 import { Toaster } from './components/ui/sonner';
 import {UploadImages} from './components/custom/tools/UploadImages';
 
-const appName ='atsmore';
+const appName ='Atsmore';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,

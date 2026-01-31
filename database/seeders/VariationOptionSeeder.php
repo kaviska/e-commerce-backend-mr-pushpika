@@ -11,12 +11,15 @@ class VariationOptionSeeder extends Seeder
 {
 
     private $variationOptions = [
+        "Default" => [
+            "1", // 1
+        ],
         "Weight" => [
-            "100g", // 1
-            "200g", // 2
-            "250g", // 3
-            "500g", // 4
-            "1kg", // 5
+            "100g", // 2
+            "200g", // 3
+            "250g", // 4
+            "500g", // 5
+            "1kg", // 6
         ],
         "Capacity" => [
             "100ml", // 6

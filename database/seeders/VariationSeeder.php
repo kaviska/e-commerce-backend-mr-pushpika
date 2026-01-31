@@ -10,6 +10,7 @@ class VariationSeeder extends Seeder
 {
 
     private $variations = [
+        'Default',
         'Weight',
         'Capacity',
         'Size',

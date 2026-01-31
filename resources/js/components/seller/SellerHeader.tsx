@@ -73,13 +73,8 @@ const SellerHeader = ({ onMenuClick }: SellerHeaderProps) => {
             </div>
 
             <div className="flex items-center gap-4">
-                <button className="p-2 text-gray-400 hover:text-gray-500 relative">
-                    <span className="sr-only">View notifications</span>
-                    <Bell className="w-6 h-6" />
-                    <span className="absolute top-2 right-2 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
-                </button>
-
-                <DropdownMenu>
+               
+                {/* <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                             <div className="flex h-full w-full items-center justify-center rounded-full bg-gray-100">
@@ -102,7 +97,7 @@ const SellerHeader = ({ onMenuClick }: SellerHeaderProps) => {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-red-600">Log out</DropdownMenuItem>
                     </DropdownMenuContent>
-                </DropdownMenu>
+                </DropdownMenu> */}
             </div>
         </header>
     );
