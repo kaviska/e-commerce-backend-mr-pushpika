@@ -3,7 +3,7 @@ import { Head } from '@inertiajs/react';
 import SellerLayout from '@/Layouts/SellerLayout';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { 
+import {
     Search,
     Loader2,
     Pencil,
@@ -38,7 +38,129 @@ const ManageVariations = () => {
     const [deletingId, setDeletingId] = useState<number | null>(null);
     const [isCreating, setIsCreating] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
-    
+
+    // Options State
+    const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+    const [currentVariationForOptions, setCurrentVariationForOptions] = useState<Variation | null>(null);
+    const [options, setOptions] = useState<any[]>([]);
+    const [optionsLoading, setOptionsLoading] = useState(false);
+    const [optionFormData, setOptionFormData] = useState({ name: '' });
+    const [editingOption, setEditingOption] = useState<any | null>(null);
+    const [isCreatingOption, setIsCreatingOption] = useState(false);
+    const [isUpdatingOption, setIsUpdatingOption] = useState(false);
+    const [deletingOptionId, setDeletingOptionId] = useState<number | null>(null);
+
+    const handleManageOptions = (variation: Variation) => {
+        setCurrentVariationForOptions(variation);
+        setIsOptionsOpen(true);
+        fetchOptions(variation.id);
+        setOptionFormData({ name: '' });
+        setEditingOption(null);
+    };
+
+    const fetchOptions = async (variationId: number) => {
+        try {
+            setOptionsLoading(true);
+            const response = await axios.get(`/api/variation-options?variation_id=${variationId}`);
+            if (response.data.status === 'success') {
+                setOptions(response.data.data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch options', error);
+            toast.error('Failed to load options');
+        } finally {
+            setOptionsLoading(false);
+        }
+    };
+
+    const handleCreateOption = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!optionFormData.name.trim() || !currentVariationForOptions) return;
+
+        setIsCreatingOption(true);
+        try {
+            const response = await axios.post('/api/variation-options', {
+                variation_id: currentVariationForOptions.id,
+                name: optionFormData.name
+            });
+
+            if (response.data.status === 'success') {
+                toast.success('Option added successfully');
+                setOptionFormData({ name: '' });
+                fetchOptions(currentVariationForOptions.id);
+            } else {
+                toast.error(response.data.message || 'Failed to add option');
+            }
+        } catch (error: any) {
+            console.error('Create option error:', error);
+            toast.error(error.response?.data?.message || 'Failed to add option');
+        } finally {
+            setIsCreatingOption(false);
+        }
+    };
+
+    const handleUpdateOption = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingOption || !optionFormData.name.trim() || !currentVariationForOptions) return;
+
+        setIsUpdatingOption(true);
+        try {
+            const response = await axios.put('/api/variation-options', {
+                id: editingOption.id,
+                variation_id: currentVariationForOptions.id,
+                name: optionFormData.name
+            });
+
+            if (response.data.status === 'success') {
+                toast.success('Option updated successfully');
+                setEditingOption(null);
+                setOptionFormData({ name: '' });
+                fetchOptions(currentVariationForOptions.id);
+            } else {
+                toast.error(response.data.message || 'Failed to update option');
+            }
+        } catch (error: any) {
+            console.error('Update option error:', error);
+            toast.error(error.response?.data?.message || 'Failed to update option');
+        } finally {
+            setIsUpdatingOption(false);
+        }
+    };
+
+    const handleDeleteOption = async (optionId: number) => {
+        if (!currentVariationForOptions) return;
+        if (!confirm('Are you sure you want to delete this option?')) return;
+
+        setDeletingOptionId(optionId);
+        try {
+            const response = await axios.delete('/api/variation-options', {
+                data: { id: optionId }
+            });
+
+            if (response.data.status === 'success') {
+                toast.success('Option deleted successfully');
+                fetchOptions(currentVariationForOptions.id);
+            } else {
+                toast.error(response.data.message || 'Failed to delete option');
+            }
+        } catch (error: any) {
+            console.error('Delete option error:', error);
+            toast.error(error.response?.data?.message || 'Failed to delete option');
+        } finally {
+            setDeletingOptionId(null);
+        }
+    };
+
+    const startEditOption = (option: any) => {
+        setEditingOption(option);
+        setOptionFormData({ name: option.name });
+    };
+
+    const cancelEditOption = () => {
+        setEditingOption(null);
+        setOptionFormData({ name: '' });
+    };
+
     // Form state
     const [formData, setFormData] = useState({
         name: ''
@@ -86,9 +208,9 @@ const ManageVariations = () => {
             }
         } catch (error: any) {
             console.error('Create error:', error);
-            const errorMessage = error.response?.data?.errors?.name?.[0] || 
-                               error.response?.data?.message || 
-                               'Failed to create variation';
+            const errorMessage = error.response?.data?.errors?.name?.[0] ||
+                error.response?.data?.message ||
+                'Failed to create variation';
             toast.error(errorMessage);
         } finally {
             setIsCreating(false);
@@ -124,9 +246,9 @@ const ManageVariations = () => {
             }
         } catch (error: any) {
             console.error('Update error:', error);
-            const errorMessage = error.response?.data?.errors?.name?.[0] || 
-                               error.response?.data?.message || 
-                               'Failed to update variation';
+            const errorMessage = error.response?.data?.errors?.name?.[0] ||
+                error.response?.data?.message ||
+                'Failed to update variation';
             toast.error(errorMessage);
         } finally {
             setIsUpdating(false);
@@ -152,9 +274,9 @@ const ManageVariations = () => {
             }
         } catch (error: any) {
             console.error('Delete error:', error);
-            const errorMessage = error.response?.data?.errors || 
-                               error.response?.data?.message || 
-                               'Failed to delete variation';
+            const errorMessage = error.response?.data?.errors ||
+                error.response?.data?.message ||
+                'Failed to delete variation';
             toast.error(errorMessage);
         } finally {
             setDeletingId(null);
@@ -172,17 +294,18 @@ const ManageVariations = () => {
         variation.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+
     return (
         <SellerLayout>
             <Head title="Manage Variations | Seller Center" />
-            
+
             <div className="space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900">Manage Variations</h1>
                         <p className="text-sm text-gray-500">Create and manage product variations (e.g., Size, Color, Material)</p>
                     </div>
-                    <Button 
+                    <Button
                         onClick={() => {
                             resetForm();
                             setIsCreateOpen(true);
@@ -219,12 +342,12 @@ const ManageVariations = () => {
                                 {searchQuery ? 'No variations found' : 'No variations yet'}
                             </h3>
                             <p className="text-sm text-gray-500 mb-4">
-                                {searchQuery 
-                                    ? 'Try adjusting your search terms' 
+                                {searchQuery
+                                    ? 'Try adjusting your search terms'
                                     : 'Get started by creating your first variation'}
                             </p>
                             {!searchQuery && (
-                                <Button 
+                                <Button
                                     onClick={() => {
                                         resetForm();
                                         setIsCreateOpen(true);
@@ -261,6 +384,14 @@ const ManageVariations = () => {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <div className="flex items-center justify-end gap-2">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() => handleManageOptions(variation)}
+                                                        className="text-gray-700 hover:bg-gray-50"
+                                                    >
+                                                        Manage Options
+                                                    </Button>
                                                     <Button
                                                         size="sm"
                                                         variant="ghost"
@@ -380,6 +511,124 @@ const ManageVariations = () => {
                             </Button>
                         </DialogFooter>
                     </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Manage Options Dialog */}
+            <Dialog open={isOptionsOpen} onOpenChange={setIsOptionsOpen}>
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>
+                            Manage Options for {currentVariationForOptions?.name}
+                        </DialogTitle>
+                        <DialogDescription>
+                            Add or edit options for this variation (e.g., Small, Medium, Large for Size).
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-6 py-4">
+                        {/* Add/Edit Option Form */}
+                        <div className="bg-gray-50 p-4 rounded-lg space-y-4 border">
+                            <h4 className="font-medium text-sm text-gray-900">
+                                {editingOption ? 'Edit Option' : 'Add New Option'}
+                            </h4>
+                            <form
+                                onSubmit={editingOption ? handleUpdateOption : handleCreateOption}
+                                className="flex gap-4 items-end"
+                            >
+                                <div className="flex-1 space-y-2">
+                                    <Label htmlFor="option-name" className="sr-only">Option Name</Label>
+                                    <Input
+                                        id="option-name"
+                                        value={optionFormData.name}
+                                        onChange={(e) => setOptionFormData({ name: e.target.value })}
+                                        placeholder="Option Name (e.g., Red)"
+                                        required
+                                    />
+                                </div>
+                                <div className="flex gap-2">
+                                    {editingOption && (
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            onClick={cancelEditOption}
+                                        >
+                                            Cancel
+                                        </Button>
+                                    )}
+                                    <Button
+                                        type="submit"
+                                        disabled={isCreatingOption || isUpdatingOption}
+                                    >
+                                        {(isCreatingOption || isUpdatingOption) && (
+                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        )}
+                                        {editingOption ? 'Update' : 'Add'}
+                                    </Button>
+                                </div>
+                            </form>
+                        </div>
+
+                        {/* Options List */}
+                        <div className="space-y-4">
+                            <h4 className="font-medium text-sm text-gray-900">Existing Options</h4>
+                            {optionsLoading ? (
+                                <div className="flex justify-center py-8">
+                                    <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+                                </div>
+                            ) : options.length === 0 ? (
+                                <div className="text-center py-8 text-gray-500 border-2 border-dashed rounded-lg">
+                                    No options added yet.
+                                </div>
+                            ) : (
+                                <div className="border rounded-md divide-y">
+                                    {options.map((option) => (
+                                        <div
+                                            key={option.id}
+                                            className="flex items-center justify-between p-3"
+                                        >
+                                            <span className="text-sm font-medium text-gray-700">
+                                                {option.name}
+                                            </span>
+                                            <div className="flex items-center gap-2">
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    onClick={() => startEditOption(option)}
+                                                    className="h-8 w-8 p-0 text-blue-600 hover:bg-blue-50"
+                                                >
+                                                    <Pencil className="w-4 h-4" />
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    onClick={() => handleDeleteOption(option.id)}
+                                                    disabled={deletingOptionId === option.id}
+                                                    className="h-8 w-8 p-0 text-red-600 hover:bg-red-50"
+                                                >
+                                                    {deletingOptionId === option.id ? (
+                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                    ) : (
+                                                        <Trash2 className="w-4 h-4" />
+                                                    )}
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setIsOptionsOpen(false)}
+                        >
+                            Close
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </SellerLayout>
